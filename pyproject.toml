@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dobot-kit"
+version = "0.2.0a2"
+description = "A small Python interface for classic DOBOT Magician robots"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{name = "Dobot Kit contributors"}]
+dependencies = ["pyserial==3.5"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: System :: Hardware :: Hardware Drivers",
+]
+
+[project.urls]
+Documentation = "https://art9762.github.io/dobot-kit/"
+Repository = "https://github.com/art9762/dobot-kit"
+Issues = "https://github.com/art9762/dobot-kit/issues"
+Releases = "https://github.com/art9762/dobot-kit/releases"
+
+[project.scripts]
+dobot = "dobotkit.cli:main"
+
+[dependency-groups]
+dev = ["build>=1.2,<2", "pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2", "types-pyserial>=3.5,<4"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dobotkit"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/examples", "/docs", "/scripts/magician_smoke.py", "/README.md", "/LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["hardware: explicitly enabled tests requiring a physical robot"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src/dobotkit"]
