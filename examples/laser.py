@@ -4,7 +4,7 @@ import argparse
 import math
 import struct
 
-from dobot_usb import Dobot, Point, ToolState
+from dobot_usb import Dobot, Point, ToolState, connect
 
 
 def mark_line(robot: Dobot, dx_mm: float, dy_mm: float) -> None:
@@ -13,21 +13,21 @@ def mark_line(robot: Dobot, dx_mm: float, dy_mm: float) -> None:
         raise ValueError("Specify a finite, nonzero XY displacement in millimetres")
     robot.tool.select("laser")
     try:
-        with robot.motion.sequence():
+        with robot.sequence():
             robot.laser.off()
             if robot.laser.state() != ToolState(False, False):
                 raise RuntimeError("Controller did not confirm laser output off")
-            robot.queue.wait()
+            robot.wait()
             start = robot.pose()
             # Plan at the same float precision as the controller before enabling the output.
             x, y = struct.unpack("<2f", struct.pack("<2f", start.x + dx_mm, start.y + dy_mm))
             if not (math.isfinite(x) and math.isfinite(y)) or (x, y) == (start.x, start.y):
                 raise ValueError("Requested line has no representable endpoint")
             target = Point(x, y, start.z, start.r)
-            robot.motion.wait_for_pose(Point(start.x, start.y, start.z, start.r))
+            robot.motion.wait_pose(Point(start.x, start.y, start.z, start.r))
             robot.laser.arm()
             robot.laser.on()
-            robot.move_to(target.x, target.y, target.z, target.r)
+            robot.move(target)
     finally:
         # Send OFF even if the motion sequence was interrupted.
         try:
@@ -36,7 +36,7 @@ def mark_line(robot: Dobot, dx_mm: float, dy_mm: float) -> None:
                 raise RuntimeError("Controller did not confirm laser output off")
         finally:
             robot.laser.disarm()
-    robot.motion.wait_for_pose(target)
+    robot.motion.wait_pose(target)
 
 
 def main() -> None:
@@ -44,7 +44,7 @@ def main() -> None:
     parser.add_argument("--port", required=True)
     parser.add_argument("--by", nargs=2, type=float, metavar=("DX_MM", "DY_MM"), required=True)
     args = parser.parse_args()
-    with Dobot.connect(args.port) as robot:
+    with connect(args.port) as robot:
         mark_line(robot, *args.by)
         print("Line endpoint reached. Controller reports laser output off.")
 

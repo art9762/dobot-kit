@@ -33,13 +33,14 @@ def test_constructor_and_close_have_no_hidden_actions() -> None:
 
 def test_pick_and_place_through_real_command_layers() -> None:
     with Dobot(SimulatedTransport()) as robot:
-        robot.speed(mm_s=30, mm_s2=100)
-        h = robot.move_to(200, 0, 60, r=5)
+        robot.speed(30, 100)
+        h = robot.move(200, 0, 60, r=5)
         assert h.state == ExecutionState.COMPLETED
         robot.suction.on()
         assert robot.suction.state().active
-        robot.move_by(x=10, z=30)
-        robot.move_to(180, 40, 90)  # wait=True preserves R after synchronization
+        robot.shift(x=10, z=30, wait=False)
+        robot.wait()
+        robot.move(180, 40, 90)  # wait=True preserves R after synchronization
         robot.suction.off()
         assert (robot.pose().x, robot.pose().y, robot.pose().z, robot.pose().r) == (180, 40, 90, 5)
         assert not robot.suction.state().enabled
@@ -64,7 +65,10 @@ def test_queue_targets_and_clear_invalidate_old_receipts() -> None:
 def test_tools_configuration_and_advanced_set_name() -> None:
     with Dobot(SimulatedTransport()) as robot:
         robot.settings.set_name("table robot")
-        assert robot.device_info().name == "table robot"
+        assert robot.info().name == "table robot"
+        assert robot.cmd is robot.advanced
+        assert robot.teach is robot.teaching
+        assert robot.wifi is robot.network
         robot.advanced.set("device_name", name="renamed")
         assert robot.advanced.get("device_name")["name"] == "renamed"
         robot.settings.set_serial_number("Lab-ä")

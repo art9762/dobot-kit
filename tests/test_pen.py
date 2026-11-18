@@ -120,13 +120,14 @@ def test_bounds_also_check_start_even_if_absent_from_targets() -> None:
         pen_path(PAPER, STROKES, start=high, bounds=bounds)
 
 
-def test_real_facade_and_simulator_execute_only_linear_ptp_points() -> None:
+@pytest.mark.parametrize("use_path", [True, False])
+def test_real_facade_and_simulator_execute_only_linear_ptp_points(use_path: bool) -> None:
     transport = SimulatedTransport()
     with Dobot(transport) as robot:
         taught = robot.pose()
         path = pen_path(taught, STROKES, start=taught, dry_run=True)
         assert all(frame.control == 0 for frame in transport.transactions)
-        handles = path.run(robot.motion)
+        handles = robot.run(path if use_path else iter(path.points))
         assert all(handle.state == ExecutionState.COMPLETED for handle in handles)
         actual = robot.pose()
         assert (actual.x, actual.y, actual.z, actual.r) == (
@@ -147,7 +148,7 @@ def test_draw_uses_fresh_start_and_reports_every_controller_checkpoint() -> None
     with Dobot(transport) as robot:
         origin = robot.pose()
         robot.move_to(origin.x + 4, origin.y, origin.z, origin.r + 10, wait=False)
-        report = robot.pen.draw(STROKES, origin=origin, lift_mm=2, dry_run=True)
+        report = robot.draw(STROKES, origin, lift_mm=2, dry_run=True)
 
     assert report.start.x == origin.x + 4
     assert report.route == pen_path(origin, STROKES, start=report.start, lift_mm=2, dry_run=True)

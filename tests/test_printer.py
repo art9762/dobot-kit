@@ -5,7 +5,8 @@ from collections import deque
 
 import pytest
 
-from dobot_usb.printing import Printer, PrinterError, PrintResult, Temperature
+from dobot_usb import Printer
+from dobot_usb.printing import PrinterError, PrintResult, Temperature
 
 INFO = b"FIRMWARE_NAME:Marlin V1 PROTOCOL_VERSION:1.0 MACHINE_TYPE:Generic\nCap:EEPROM:0\nok\n"
 TEMP = b"ok T:199.25 /200.0 B:0.0 /0.0 @:0\n"
@@ -90,7 +91,7 @@ def test_handshake_and_temperature_do_not_change_machine(wire):
     wire.replies.append((b"M105", b"T0:21.75 B:19.0\nok\n"))
     with Printer.connect("COM7") as printer:
         assert printer.firmware == "Marlin V1"
-        assert printer.temperature() == Temperature(21.75, None)
+        assert printer.temp() == Temperature(21.75, None)
         assert wire.opened == [("COM7", False, False)]
         assert wire.written == [b"M115", b"M105", b"M105"]
     assert wire.closed
@@ -146,7 +147,7 @@ def test_print_completed_via_confirmed_barrier_and_uses_prepared_bytes(wire, tmp
 
     with Printer.connect("selected") as printer:
         wire.hook = change_after_preflight
-        result = printer.print_file(file)
+        result = printer.print(file)
         assert result == PrintResult(file.resolve(), len(lines))
         assert wire.written == [b"M115", b"M105", b"M400", *lines, b"M400"]
 

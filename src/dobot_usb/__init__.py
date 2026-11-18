@@ -1,8 +1,8 @@
 """Small high-level interface for classic DOBOT Magician robots."""
 
-from .client import Dobot
+from .client import Dobot, connect
 from .commands import CommandSpec
-from .discovery import discover
+from .discovery import discover, ports
 from .errors import (
     CommandInvalidated,
     ConnectionError,
@@ -19,12 +19,16 @@ from .models import DeviceInfo, Point, PortInfo, Pose, Status, ToolState
 from .motion import PTPMode
 from .paths import Bounds, Path, Preview
 from .pen import PenCheckpoint, PenReport, pen_path
+from .printer import Printer
 from .tools import LaserNotArmed
 
-__version__ = "0.2.0a3"
+__version__ = "0.2.0a4"
 __all__ = [
     "Dobot",
+    "connect",
+    "ports",
     "discover",
+    "Printer",
     "DobotError",
     "ConnectionError",
     "ProtocolError",

@@ -90,6 +90,10 @@ class SuctionHead(Suction):
         super().__init__(backend)
         self._robot = robot
 
+    def transfer(self, pick: Point | Pose, place: Point | Pose, lift_mm: float) -> None:
+        """Transfer between the two poses with an explicit lift in millimetres."""
+        self.pick_and_place(pick, place, lift_mm=lift_mm)
+
     def pick_and_place(self, pick: Point | Pose, place: Point | Pose, *, lift_mm: float) -> None:
         """Pick with vacuum, release at place, and lift above all three poses by lift_mm."""
         _pick_and_place(self._robot, self, pick, place, lift_mm)
@@ -99,6 +103,10 @@ class GripperHead(Gripper):
     def __init__(self, backend: Backend, robot: Dobot) -> None:
         super().__init__(backend)
         self._robot = robot
+
+    def transfer(self, pick: Point | Pose, place: Point | Pose, lift_mm: float) -> None:
+        """Transfer between the two poses with an explicit lift in millimetres."""
+        self.pick_and_place(pick, place, lift_mm=lift_mm)
 
     def pick_and_place(self, pick: Point | Pose, place: Point | Pose, *, lift_mm: float) -> None:
         """Transfer with the jaws, then disable gripper control at the final clearance."""

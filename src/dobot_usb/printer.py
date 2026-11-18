@@ -213,6 +213,9 @@ class Printer:
                 self.close()
                 raise
 
+    temp = temperature
+    print = print_file
+
     def close(self) -> None:
         """End host transmission. Accepted movement and heater targets can remain active."""
         self._closed.set()

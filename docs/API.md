@@ -1,4 +1,4 @@
-# API Dobot Kit 0.2.0a3
+# API Dobot Kit
 
 Документация для классического DOBOT Magician. Для проверенной конфигурации и
 подтверждённых режимов см. [аппаратный отчёт](HARDWARE.md).
@@ -6,21 +6,21 @@
 ## Обычная программа
 
 ```python
-from dobot_usb import Dobot
+from dobot_usb import connect
 
 port = input("Порт из dobot ports: ").strip()
-with Dobot.connect(port, read_only=True) as robot:
+with connect(port, read_only=True) as robot:
     print(robot.pose(), robot.alarms())
 ```
 
-`Dobot.connect(port, timeout=1.0, read_only=False)` открывает явный serial-порт,
+`connect(port, timeout=1.0, read_only=False)` открывает явный serial-порт,
 проверяет версию, позу и alarms только чтением. Он не запускает очередь, homing,
 сброс ошибок, очистку или выходы. В режиме `read_only=True` доступны девять начальных
-GET-запросов, идентификация контроллера (`robot.settings.identification()`), смещение
+GET-запросов, идентификация контроллера (`robot.settings.ids()`), смещение
 инструмента (`robot.tool.get_offset()`) и параметры PTP
-(`robot.advanced.get("ptp_joint_params")`, `"ptp_coordinate_params"`, `"ptp_jump_params"`,
+(`robot.cmd.get("ptp_joint_params")`, `"ptp_coordinate_params"`, `"ptp_jump_params"`,
 `"ptp_common_params"`). CLI `status` всегда использует этот режим.
-`discover()` только перечисляет кандидатов USB; совпадение VID/PID не доказывает модель.
+`ports()` только перечисляет кандидатов USB; совпадение VID/PID не доказывает модель.
 
 `with`/`close()` освобождают соединение и инвалидируют квитанции, но не выключают
 инструменты, не открывают клешню и не отправляют остановку. Управление очередью и
@@ -32,17 +32,18 @@ GET-запросов, идентификация контроллера (`robot.
 | Вызов | Поведение |
 | --- | --- |
 | `pose()` | `Pose(x,y,z,r,joints)` в мм и градусах |
-| `device_info()` | Прошивка, raw-ответ версии, имя и необязательный SN |
+| `info()` | Прошивка, raw-ответ версии, имя и необязательный SN |
 | `alarms()` | Номера активных битов; без неподтверждённой смысловой расшифровки |
 | `status()` | Несколько последовательных чтений; результат не атомарный |
 | `tool_state(tool)` | Состояния выходов `enabled/active`; не обнаружение оснастки |
 | `queue_index()` | uint64 индекс; не измерение физической точности |
-| `move_to(x,y,z,r=None,path="linear",wait=True,timeout=30)` | Абсолютная декартова цель; path `linear/joint/jump` |
-| `move_to(saved_pose)`, `move_to(point)` | Возврат в сохранённые XYZ и R. Принимает результат `pose()` или `Point`. Путь строится в декартовом пространстве |
-| `move_by(x=0,y=0,z=0,r=0,path="linear",...)` | Нативное декартово смещение; path `linear/joint` |
-| `move_joints(j1,j2,j3,j4,relative=False,...)` | Углы суставов, абсолютные либо приращения |
+| `move(x,y,z,r=None,path="linear",wait=True,timeout=30)` | Абсолютная декартова цель; path `linear/joint/jump` |
+| `move(saved_pose)`, `move(point)` | Возврат в сохранённые XYZ и R. Принимает результат `pose()` или `Point`. Путь строится в декартовом пространстве |
+| `shift(x=0,y=0,z=0,r=0,path="linear",...)` | Нативное декартово смещение; path `linear/joint` |
+| `joints(j1,j2,j3,j4,relative=False,...)` | Углы суставов, абсолютные либо приращения |
+| `run(route)` | Выполнить `Path` или список точек и сохранённых поз |
 | `home(wait=True,timeout=60)` | Явный запуск homing |
-| `speed(mm_s=...,mm_s2=...,deg_s=None,deg_s2=None)` | Номинальные PTP параметры; незаданные R-ограничения сохраняются |
+| `speed(mm_s, mm_s2, *, deg_s=None, deg_s2=None)` | Номинальные PTP параметры; незаданные R-ограничения сохраняются |
 | `stop(clear=True)` | Force-stop очереди, по умолчанию с явной очисткой |
 
 Именованные параметры в исходных сигнатурах помечены `*`; полные сигнатуры —
@@ -52,32 +53,32 @@ GET-запросов, идентификация контроллера (`robot.
 
 Пропущенный R допустим при `wait=True`: сначала дожидаемся собственных отложенных
 команд, затем читаем позу. При `wait=False` R нужно передавать явно. Так старая
-физическая поза не подменяет уже запланированный угол. `move_by()` использует
+физическая поза не подменяет уже запланированный угол. `shift()` использует
 относительный режим, а не чтение и пересчёт абсолютной цели.
 
 `speed()` не меняет проценты, суставные скорости, JOG и CP скрыто. Фактический режим
 дополнительно зависит от процентных коэффициентов контроллера, которые доступны через
-`settings.velocity_ratios()` / `set_velocity_ratios(...)`.
+`settings.ratios()` / `set_ratios(...)`.
 
 `motion` дополнительно содержит `ptp(PTPMode,...)`, `jump(height=...,z_limit=...)`,
-`arc(via=Point(...),to=Point(...))`, `line_to/line_by`, `jog` и `jog_stop`.
+`arc(via=Point(...),to=Point(...))`, `line/line_by`, `jog` и `jog_stop`.
 Перед JUMP нужно явно задать параметры подъёма. JOG имеет заданную длительность и
 пытается отправить остановку в finally; потеря связи не позволяет гарантировать её успех.
 CP `velocity` — зарезервированный аргумент, допускается только 0; настройки CP задаются
-через `advanced.set("cp_params",...)`. Мощность CP-лазера задаётся отдельной схемой.
+через `cmd.set("cp_params",...)`. Мощность CP-лазера задаётся отдельной схемой.
 
 ## Инструменты и расширения
 
-- Для переноса между двумя позами есть `suction.pick_and_place(pick, place, lift_mm=...)` и `gripper.pick_and_place(pick, place, lift_mm=...)`. Захватом также управляют по шагам через `suction.on/off/state` и `gripper.open/close/release/state`. [Перенос и высота подхода](TOOLS.md#перенос-присоской-или-схватом)
+- Для переноса между двумя позами есть `suction.transfer(pick, place, lift_mm)` и `gripper.transfer(pick, place, lift_mm)`. Захватом также управляют по шагам через `suction.on/off/state` и `gripper.open/close/release/state`. [Перенос и высота подхода](TOOLS.md#перенос-присоской-или-схватом)
 - `laser.arm/on/off/disarm/state`. Arm/disarm — локальное разрешение, off — отдельный
   запрос выключения. Потеря сессии, stop и clear отменяют локальное разрешение.
-- `tool.select(name)` выбирает локальный профиль без IO; `tool.offset(x=...,y=...,z=...)`
+- `tool.select(name)` выбирает локальный профиль без IO; `tool.offset(x, y, z)`
   задаёт TCP. Измеренные смещения из фотографий не выдумываются.
-- `io`, `motors`, `rail`, `sensors`, `teaching`, `settings`, `network` —
+- `io`, `motors`, `rail`, `sensors`, `teach`, `settings`, `wifi` —
   [операции и единицы](PERIPHERALS.md).
-- `conveyor.configure(index=0,steps_per_mm=...)` сохраняет измеренную калибровку без IO;
+- `conveyor.configure(0, steps_per_mm)` сохраняет измеренную калибровку без IO;
   после этого `conveyor.run(mm_s)` переводит скорость в шаги/с. `conveyor.stop()` отключает мотор.
-- Для принтерной прошивки используй `from dobot_usb.printing import Printer` и отдельное соединение `Printer.connect(port)`. Оно читает температуру и принимает готовый файл через `print_file()`. [Формат и пример](PRINTING.md)
+- Для принтерной прошивки используй `from dobot_usb import Printer` и отдельное соединение `Printer.connect(port)`. Оно читает температуру и принимает готовый файл через `print()`. [Формат и пример](PRINTING.md)
 
 Отдельные команды движения и управления выходами возвращают `CommandHandle`. Завершившийся перенос возвращает `None`, рисование возвращает `PenReport`. Состояние контроллера не доказывает реальное удержание
 предмета или присутствие инструмента. Для неизвестной клешни значения состояний
@@ -85,20 +86,20 @@ CP `velocity` — зарезервированный аргумент, допу�
 
 ## Планирование для пера
 
-Для готового задания вызови `robot.pen.draw(strokes, origin=contact)`. `contact` получают через `pose()` при лёгком касании листа. Метод считывает стартовую позу, сверяет достигнутые точки и возвращает отчёт. Скорость задаётся через `robot.speed(...)`. Пробный проход выше бумаги выполняет `dry_run=True`. [Рабочий пример](MOTION.md#перо-на-плоском-листе)
+Для готового задания вызови `robot.draw(strokes, contact)`. `contact` получают через `pose()` при лёгком касании листа. Метод считывает стартовую позу, сверяет достигнутые точки и возвращает отчёт. Скорость задаётся через `robot.speed(...)`. Пробный проход выше бумаги выполняет `dry_run=True`. [Рабочий пример](MOTION.md#перо-на-плоском-листе)
 
 `pen_path(origin, strokes, start=..., lift_mm=3, dry_run=False, bounds=None)`
 возвращает `Path` из линейных целей. Укажи позу касания листа и текущую позу.
-`motion.wait_for_pose(target)` читает две последовательные позы и ошибки
+`motion.wait_pose(target)` читает две последовательные позы и ошибки
 контроллера, отдельно от ожидания индекса очереди. [Пример](MOTION.md#перо-на-плоском-листе).
 
 ## Очередь и ошибки
 
-Чтобы остановка прервала и оставшуюся часть твоей программы из нескольких действий, объедини их в `with robot.motion.sequence():`. Так устроен [пример с присоской](../examples/pick_and_place.py). После `robot.stop()` внутри прежней последовательности следующее действие получит `CommandInvalidated`. Новое задание можно начать отдельно.
+Чтобы остановка прервала и оставшуюся часть твоей программы из нескольких действий, объедини их в `with robot.sequence():`. Так устроен [пример маршрута по обученным точкам](../examples/point_path.py). После `robot.stop()` внутри прежней последовательности следующее действие получит `CommandInvalidated`. Новое задание можно начать отдельно.
 
 ```python
 # Внутри открытого соединения, после выбора свободного пути.
-handle = robot.move_by(z=2, wait=False)
+handle = robot.shift(z=2, wait=False)
 handle.wait(timeout=5)
 print(handle.state, handle.queue_index)
 ```
@@ -107,7 +108,7 @@ Queued ACK означает `accepted`. Индекс исполнения под
 контроллера. Immediate SET возвращает только accepted: `wait=True` в удобной группе
 ждёт ACK, а отдельный `handle.wait()` сообщает `OutcomeUnknown`, поскольку индекса нет.
 
-`queue.start/pause/stop/clear/wait/index/delay/trigger` работают с текущей сессией.
+`robot.wait()` ждёт последнюю принятую команду очереди этого клиента. Методы `queue.start/pause/stop/clear/wait/index/delay/trigger` работают с текущей сессией.
 Первая отправка запускает очередь, включая команды, оставленные в ней другим клиентом.
 После паузы или остановки следующая отправка снова запускает очередь.
 `handle.cancel()` отменяет ожидание. Clear/close делают старые дескрипторы
@@ -123,16 +124,16 @@ queue_index и session_id, когда они известны. Неправил�
 
 ## Несколько рук
 
-Каждый вызов `Dobot.connect` открывает один выбранный порт. `dobot ports` показывает поле `device` у кандидатов. При первом подключении сопоставь каждую руку с портом, подключая по одной. После перестановки USB проверь соответствие снова. Независимые объекты удобно называть по роли руки.
+Каждый вызов `connect` открывает один выбранный порт. `dobot ports` показывает поле `device` у кандидатов. При первом подключении сопоставь каждую руку с портом, подключая по одной. После перестановки USB проверь соответствие снова. Независимые объекты удобно называть по роли руки.
 
 ```python
-from dobot_usb import Dobot
+from dobot_usb import connect
 
 left_port = input("Порт левой руки: ").strip()
 right_port = input("Порт правой руки: ").strip()
 with (
-    Dobot.connect(left_port, read_only=True) as left,
-    Dobot.connect(right_port, read_only=True) as right,
+    connect(left_port, read_only=True) as left,
+    connect(right_port, read_only=True) as right,
 ):
     for label, arm in [("Левая", left), ("Правая", right)]:
         state = arm.status()
@@ -144,15 +145,15 @@ with (
 ## Полный именованный протокол
 
 ```python
-with Dobot.connect(port, read_only=True) as robot:
-    print(robot.advanced.get("ptp_common_params"))
+with connect(port, read_only=True) as robot:
+    print(robot.cmd.get("ptp_common_params"))
 ```
 
-`advanced.commands` перечисляет все 69 ключей, `describe(name)` возвращает CommandSpec
+`cmd.commands` перечисляет все 69 ключей, `describe(name)` возвращает CommandSpec
 с направлением, ID, разделом и политикой очереди. Поля каждого запроса и ответа указаны
 в [полном реестре схем](PROTOCOL-IMPLEMENTATION.md). Команды жизненного цикла проходят
-через executor и при clear инвалидируют квитанции. `advanced.read(id)` оставлен для
+через executor и при clear инвалидируют квитанции. `cmd.read(id)` оставлен для
 девяти старых запросов и возвращает bytes; обычному коду он не нужен.
 
 Два неоднозначных формата отклоняются с конкретной причиной. Raw-обход не считается
-их реализацией. Для штатной печатающей головки и её отдельной прошивки см. [печать из Python](PRINTING.md). Для остальных насадок используется стандартное USB-соединение `Dobot.connect(port)`.
+их реализацией. Для штатной печатающей головки и её отдельной прошивки см. [печать из Python](PRINTING.md). Для остальных насадок используется стандартное USB-соединение `connect(port)`.

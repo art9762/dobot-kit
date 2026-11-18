@@ -23,7 +23,7 @@ occurs before calling the backend; codecs remain responsible for wire representa
 - `Tool.select("pen" | "suction" | "gripper" | "laser")` selects an immutable local
   `ToolProfile(name)`. `current` is initially `None`. Selection performs no IO, changes
   no TCP and activates no output. No measured geometry or device detection is implied.
-- `Tool.offset(x=..., y=..., z=...)` writes end-effector XYZ bias in mm;
+- `Tool.offset(x, y, z)` writes end-effector XYZ bias in mm;
   `get_offset()` returns `ToolOffset(x, y, z)` from a fresh query. There are no invented
   per-tool offsets. The same controller TCP is available as `Settings.tcp()/set_tcp(...)`.
 - Tool states are the existing `models.ToolState` with separately checked boolean bits.
@@ -52,13 +52,13 @@ transport owner or independent polling thread.
 
 | Group | Public operations and units |
 | --- | --- |
-| `IO` | `multiplex(address, IOFunction)`, `multiplexing(address)`, `write(address, level)`, `read(address)` for DI, `output(address)` for DO, `pwm(address, frequency=Hz, duty_cycle=percent)`, `pwm_state(address)`, `analog(address)` |
+| `IO` | `set_mode(address, IOFunction)`, `mode(address)`, `write(address, level)`, `read(address)` for DI, `output(address)` for DO, `pwm(address, frequency_hz, duty_percent)`, `pwm_state(address)`, `analog(address)` |
 | `Motors` | `run(index, speed_steps_s)`, `stop(index)`; index 0/1, signed int32 pulses/steps per second; stop disables control with speed zero |
-| `Sensors` | `configure_color(enabled=..., port=..., version=...)`, `color()` returning RGB byte tuple, `configure_infrared(...)`, `infrared(port=...)` returning bool |
-| `Rail` | `position()` in mm, `configuration()`, `configure(enabled=..., version=...)`, `parameters(jogging=False)`, `speed(mm_s=..., mm_s2=..., jogging=False)`, `move_to(position, x=..., y=..., z=..., r=..., path="linear" | "joint")` |
-| `Teaching` | `mode()/set_mode(TeachingMode.KEY_RELEASED | PERIODIC)`, `enabled()/enable(bool)`, `triggered()`; no hidden point capture, replay or motion |
-| `Settings` | `identification()`, `set_name(...)`, `set_serial_number(...)`, `tcp()/set_tcp(...)`, `home_position()/set_home_position(...)`, `velocity_ratios()/set_velocity_ratios(velocity=..., acceleration=...)`, `alarms()/clear_alarms()`, `angle_sensor_errors()/set_angle_sensor_errors(...)`, `reset_pose(...)`, `set_lost_step_threshold(value)`, `check_lost_steps()` |
-| `Network` | `config_mode()/set_config_mode(...)`, `ssid()/set_ssid(...)`, `password()/set_password(...)`, `ip_address()/set_ip_address(address, dhcp=...)`, netmask/gateway/DNS read and set methods, `connected()` |
+| `Sensors` | `set_color(enabled=..., port=..., version=...)`, `color()` returning RGB byte tuple, `set_ir(...)`, `ir(port)` returning bool |
+| `Rail` | `position()` in mm, `configuration()`, `configure(enabled=..., version=...)`, `parameters(jogging=False)`, `speed(mm_s, mm_s2, jogging=False)`, `move(position, target, path="linear")` |
+| `Teaching` | `mode()/set_mode(TeachingMode.KEY_RELEASED or PERIODIC)`, `enabled()/enable(bool)`, `triggered()`; no hidden point capture, replay or motion |
+| `Settings` | `ids()`, `set_name(...)`, `set_serial(...)`, `tcp()/set_tcp(...)`, `home_pos()/set_home(x, y, z, r)`, `ratios()/set_ratios(velocity, acceleration)`, `alarms()/clear_alarms()`, `angle_errors()/set_angle_errors(...)`, `reset_pose(...)`, `set_lost_step_threshold(value)`, `check_lost_steps()` |
+| `Network` | `config_mode()/set_config_mode(...)`, `ssid()/set_ssid(...)`, `password()/set_password(...)`, `ip()/set_ip(address, dhcp=...)`, netmask/gateway/DNS read and set methods, `connected()` |
 
 EIO addresses are 1..20, PWM frequency 10..1,000,000 Hz and duty cycle 0..100 percent;
 which functions a physical connector supports requires the hardware profile. IO calls

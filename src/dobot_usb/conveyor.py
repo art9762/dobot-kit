@@ -11,7 +11,7 @@ class Conveyor:
         self._index: int | None = None
         self._steps_per_mm: float | None = None
 
-    def configure(self, *, index: int, steps_per_mm: float) -> None:
+    def configure(self, index: int, steps_per_mm: float) -> None:
         """Store measured calibration locally; never turn a motor on."""
         if type(index) is not int or index not in (0, 1):
             raise ValueError("index must be 0 or 1")

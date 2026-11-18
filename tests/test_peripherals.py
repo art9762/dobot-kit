@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from dobot_usb import Dobot
+from dobot_usb import Dobot, Point
 from dobot_usb.errors import ProtocolError, RequestTimeout, RobotAlarmError
 from dobot_usb.peripherals import (
     IO,
@@ -82,13 +82,13 @@ def test_io_does_not_configure_ports_implicitly():
     )
     io = IO(backend)
     assert backend.calls == []
-    io.multiplex(2, IOFunction.OUTPUT)
-    assert io.multiplexing(2) == IOFunction.OUTPUT
+    io.set_mode(2, IOFunction.OUTPUT)
+    assert io.mode(2) == IOFunction.OUTPUT
     assert io.write(2, True, wait=False, timeout=3) is backend.receipt
     assert io.output(2) is True
     assert io.read(3) is False
     assert io.analog(4) == 2048
-    io.pwm(5, frequency=1000, duty_cycle=50)
+    io.pwm(5, 1000, 50)
     assert io.pwm_state(5) == PWMState(1000, 50)
     assert [call[1] for call in backend.calls] == [
         "io_multiplexing",
@@ -129,10 +129,10 @@ def test_sensors_use_explicit_revision_and_ir_read_port():
         replies={"color_sensor": {"r": 1, "g": 2, "b": 3}, "ir_switch": {"state": True}}
     )
     sensors = Sensors(backend)
-    sensors.configure_color(enabled=True, port=0, version=1)
-    sensors.configure_infrared(enabled=True, port=1, version=0)
+    sensors.set_color(enabled=True, port=0, version=1)
+    sensors.set_ir(enabled=True, port=1, version=0)
     assert sensors.color() == (1, 2, 3)
-    assert sensors.infrared(port=1) is True
+    assert sensors.ir(1) is True
     assert backend.calls[0][2] == {"enabled": True, "port": 0, "version": 1}
     assert backend.calls[1][2] == {"enabled": True, "port": 1, "version": 0}
     assert backend.calls[-1] == ("read", "ir_switch", {"port": 1})
@@ -151,12 +151,12 @@ def test_rail_move_has_explicit_arm_target_and_does_not_read_stale_pose():
     assert rail.position() == 42
     assert rail.configuration() == {"enabled": True}
     rail.configure(enabled=True, version=1)
-    rail.speed(mm_s=30, mm_s2=60)
+    rail.speed(30, 60)
     rail.speed(mm_s=5, mm_s2=10, jogging=True)
     assert rail.parameters() == RailParameters(30, 60)
     assert rail.parameters(jogging=True) == RailParameters(5, 10)
     backend.calls.clear()
-    assert rail.move_to(100, x=200, y=0, z=80, r=0, wait=False) is backend.receipt
+    assert rail.move(100, Point(200, 0, 80, 0), wait=False) is backend.receipt
     rail.move_to(150, x=210, y=10, z=90, r=5, path="joint")
     assert len(backend.calls) == 2
     assert backend.calls[0][1:3] == (
@@ -218,9 +218,9 @@ def test_settings_identification_tcp_independent_homing_and_calibration():
     settings.set_serial_number("offline2")
     assert backend.calls[-2][2] == {"name": "bench 2"}
     assert settings.home_position() == HomePosition(200, 0, 80, 0)
-    settings.set_home_position(x=210, y=1, z=90, r=2)
+    settings.set_home(210, 1, 90, 2)
     assert settings.velocity_ratios() == VelocityRatios(20, 30)
-    settings.set_velocity_ratios(velocity=25, acceleration=50)
+    settings.set_ratios(25, 50)
     assert settings.angle_sensor_errors() == AngleSensorErrors(-0.5, 0.25)
     settings.set_angle_sensor_errors(rear_arm_angle_error=0.1, front_arm_angle_error=-0.2)
     assert backend.calls[-1][2] == {"rear_arm_angle": 0.1, "front_arm_angle": -0.2}
@@ -258,12 +258,12 @@ def test_network_configuration_keeps_password_out_of_repr_and_does_not_cache_it(
     network.set_config_mode(False)
     network.set_ssid("offline2")
     network.set_password("test-only-secret2")
-    network.set_ip_address("192.168.1.2", dhcp=False)
+    network.set_ip("192.168.1.2", dhcp=False)
     network.set_netmask("255.255.255.0")
     network.set_gateway("192.168.1.1")
     network.set_dns("1.1.1.1")
     assert backend.calls[-4][2] == {"address": "192.168.1.2", "dhcp": False}
-    assert network.ip_address() == {"address": "192.168.1.2", "dhcp": False}
+    assert network.ip() == {"address": "192.168.1.2", "dhcp": False}
     assert network.netmask() == {"address": "255.255.255.0"}
     assert network.gateway() == {"address": "192.168.1.1"}
     assert network.dns() == {"address": "1.1.1.1"}

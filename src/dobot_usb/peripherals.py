@@ -25,6 +25,7 @@ from .tools import (
 
 if TYPE_CHECKING:
     from .execution import CommandHandle
+    from .models import Point, Pose
 
 
 def _text(name: str, value: object) -> str:
@@ -77,6 +78,9 @@ class IO(_Group):
         data = self._backend.read("io_multiplexing", address=_integer("address", address, 1, 20))
         return IOFunction(_result_integer(data, "multiplex", 0, 4))
 
+    mode = multiplexing
+    set_mode = multiplex
+
     def write(
         self, address: int, level: bool, *, wait: bool = True, timeout: float = 30.0
     ) -> CommandHandle:
@@ -95,9 +99,9 @@ class IO(_Group):
     def pwm(
         self,
         address: int,
-        *,
         frequency: float,
         duty_cycle: float,
+        *,
         wait: bool = True,
         timeout: float = 30.0,
     ) -> CommandHandle:
@@ -179,9 +183,13 @@ class Sensors(_Group):
             "ir_switch", enabled=enabled, port=port, version=version, wait=wait, timeout=timeout
         )
 
-    def infrared(self, *, port: int) -> bool:
+    def infrared(self, port: int) -> bool:
         data = self._backend.read("ir_switch", port=_integer("port", port, 0, 255))
         return _result_bool(data, "state")
+
+    ir = infrared
+    set_ir = configure_infrared
+    set_color = configure_color
 
 
 @dataclass(frozen=True)
@@ -216,9 +224,9 @@ class Rail(_Group):
 
     def speed(
         self,
-        *,
         mm_s: float,
         mm_s2: float,
+        *,
         jogging: bool = False,
         wait: bool = True,
         timeout: float = 30.0,
@@ -230,6 +238,27 @@ class Rail(_Group):
             "jog_l_params" if jogging else "ptp_l_params",
             velocity=velocity,
             acceleration=acceleration,
+            wait=wait,
+            timeout=timeout,
+        )
+
+    def move(
+        self,
+        position: float,
+        target: Point | Pose,
+        *,
+        path: Literal["linear", "joint"] = "linear",
+        wait: bool = True,
+        timeout: float = 30.0,
+    ) -> CommandHandle:
+        """Move to an absolute rail coordinate and an explicit XYZ/R target."""
+        return self.move_to(
+            position,
+            x=target.x,
+            y=target.y,
+            z=target.z,
+            r=target.r,
+            path=path,
             wait=wait,
             timeout=timeout,
         )
@@ -329,6 +358,8 @@ class Settings(_Group):
             for name in ("device_sn", "device_name", "device_version", "device_id")
         }
 
+    ids = identification
+
     def set_name(self, name: str, *, wait: bool = True, timeout: float = 30.0) -> CommandHandle:
         return self._write("device_name", name=_text("name", name), wait=wait, timeout=timeout)
 
@@ -342,17 +373,22 @@ class Settings(_Group):
             timeout=timeout,
         )
 
+    set_serial = set_serial_number
+
     def home_position(self) -> HomePosition:
         data = self._backend.read("home_params")
         return HomePosition(*(_result_number(data, key) for key in ("x", "y", "z", "r")))
 
     def set_home_position(
-        self, *, x: float, y: float, z: float, r: float, wait: bool = True, timeout: float = 30.0
+        self, x: float, y: float, z: float, r: float, *, wait: bool = True, timeout: float = 30.0
     ) -> CommandHandle:
         values: dict[str, object] = {
             key: _number(key, val) for key, val in (("x", x), ("y", y), ("z", z), ("r", r))
         }
         return self._write("home_params", wait=wait, timeout=timeout, queued=None, **values)
+
+    home_pos = home_position
+    set_home = set_home_position
 
     def velocity_ratios(self) -> VelocityRatios:
         data = self._backend.read("ptp_common_params")
@@ -361,7 +397,7 @@ class Settings(_Group):
         )
 
     def set_velocity_ratios(
-        self, *, velocity: float, acceleration: float, wait: bool = True, timeout: float = 30.0
+        self, velocity: float, acceleration: float, *, wait: bool = True, timeout: float = 30.0
     ) -> CommandHandle:
         speed = _number("velocity", velocity, minimum=0)
         ramp = _number("acceleration", acceleration, minimum=0)
@@ -374,6 +410,9 @@ class Settings(_Group):
             wait=wait,
             timeout=timeout,
         )
+
+    ratios = velocity_ratios
+    set_ratios = set_velocity_ratios
 
     def alarms(self) -> dict[str, object]:
         return self._backend.read("alarms")
@@ -406,6 +445,9 @@ class Settings(_Group):
             wait=wait,
             timeout=timeout,
         )
+
+    angle_errors = angle_sensor_errors
+    set_angle_errors = set_angle_sensor_errors
 
     def reset_pose(
         self,
@@ -500,6 +542,9 @@ class Network(_Group):
         return self._write(
             "wifi_ip_address", address=validated, dhcp=automatic, wait=wait, timeout=timeout
         )
+
+    ip = ip_address
+    set_ip = set_ip_address
 
     @staticmethod
     def _address(address: str) -> str:

@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from dobot_usb.models import Point
+from dobot_usb.models import Point, Pose
 from dobot_usb.paths import Bounds, Path
 
 
@@ -27,11 +27,11 @@ BOUNDS = Bounds(Point(-10, -10, -10, -180), Point(10, 10, 10, 180))
 
 
 def test_immutable_builder_and_offline_preview() -> None:
-    source = [Point(1, 2, 3, 4)]
+    source = [Pose(1, 2, 3, 4, (4, 3, 2, 1))]
     path = Path(source)
-    source.append(Point(9, 9, 9, 9))
+    source.append(Pose(9, 9, 9, 9, (9, 9, 9, 9)))
     longer = path.then(Point(-1, 5, 0, 10))
-    assert len(path.points) == 1
+    assert path.points == (Point(1, 2, 3, 4),)
     preview = longer.preview(BOUNDS)
     assert preview.points == longer.points
     assert preview.bounds == Bounds(Point(-1, 2, 0, 4), Point(1, 5, 3, 10))

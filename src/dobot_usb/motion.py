@@ -213,6 +213,11 @@ class Motion:
         mode = PTPMode.MOVJ_INC if relative else PTPMode.MOVJ_ANGLE
         return self.ptp(mode, j1, j2, j3, j4, wait=wait, timeout=timeout)
 
+    move = move_to
+    shift = move_by
+    joints = move_joints
+    wait_pose = wait_for_pose
+
     def home(self, *, wait: bool = True, timeout: float = 60) -> CommandHandle:
         options(wait, timeout)
         self._ready()
@@ -220,9 +225,9 @@ class Motion:
 
     def speed(
         self,
-        *,
         mm_s: float,
         mm_s2: float,
+        *,
         deg_s: float | None = None,
         deg_s2: float | None = None,
     ) -> CommandHandle:
@@ -307,6 +312,8 @@ class Motion:
     ) -> CommandHandle:
         """Absolute CP point, preserving R; configure CP rates through cp_params."""
         return self._line(1, x, y, z, velocity, wait, timeout)
+
+    line = line_to
 
     def line_by(
         self,

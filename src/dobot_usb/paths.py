@@ -6,7 +6,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from .models import Point
+from .models import Point, Pose
 from .motion import validated_point
 from .validation import options
 
@@ -42,6 +42,12 @@ class Preview:
     bounds: Bounds | None
 
 
+def _waypoint(point: Point | Pose) -> Point:
+    if isinstance(point, Pose):
+        point = Point(point.x, point.y, point.z, point.r)
+    return validated_point(point)
+
+
 @dataclass(frozen=True, init=False)
 class Path:
     """Validated absolute linear PTP route, including the first approach point.
@@ -51,12 +57,12 @@ class Path:
 
     points: tuple[Point, ...]
 
-    def __init__(self, points: Iterable[Point] = ()) -> None:
-        object.__setattr__(self, "points", tuple(validated_point(p) for p in points))
+    def __init__(self, points: Iterable[Point | Pose] = ()) -> None:
+        object.__setattr__(self, "points", tuple(_waypoint(point) for point in points))
 
-    def then(self, point: Point) -> Path:
+    def then(self, point: Point | Pose) -> Path:
         """Return a new path with one explicit XYZ/R point appended."""
-        return Path((*self.points, validated_point(point)))
+        return Path((*self.points, point))
 
     def preview(self, bounds: Bounds | None = None) -> Preview:
         """Offline extent and optional bounds validation of every target."""

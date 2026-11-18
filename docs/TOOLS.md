@@ -2,9 +2,9 @@
 
 | Инструмент | Основные вызовы | Готовый пример |
 | --- | --- | --- |
-| Присоска | `robot.suction.pick_and_place(pick, place, lift_mm=...)` переносит предмет с вакуумом | [Перенос предмета](../examples/pick_and_place.py) |
-| Схват | `robot.gripper.pick_and_place(pick, place, lift_mm=...)` переносит предмет и отключает управление губками | [Захват и укладка по двум точкам](../examples/gripper.py) |
-| Перо | `robot.pen.draw(strokes, origin=contact)` рисует штрихи со снятием пера между ними | [Рисование и пробный проход](MOTION.md#перо-на-плоском-листе) |
+| Присоска | `robot.suction.transfer(pick, place, lift_mm)` переносит предмет с вакуумом | [Перенос предмета](../examples/pick_and_place.py) |
+| Схват | `robot.gripper.transfer(pick, place, lift_mm)` переносит предмет и отключает управление губками | [Захват и укладка по двум точкам](../examples/gripper.py) |
+| Перо | `robot.draw(strokes, contact)` рисует штрихи со снятием пера между ними | [Рисование и пробный проход](MOTION.md#перо-на-плоском-листе) |
 | Лазер | `robot.laser.arm()` разрешает включение, `on()` включает выход, `off()` выключает | [Одна линия с выключением на выходе](../examples/laser.py) |
 | Печатающая головка | Свой режим контроллера, подготовка задания и управление печатью | [3D-печать](PRINTING.md) |
 
@@ -31,13 +31,13 @@ print(robot.tool.get_offset())
 `Point(x, y, z, r)` с XYZ в миллиметрах и R в градусах.
 
 ```python
-robot.suction.pick_and_place(pick, place, lift_mm=10)
+robot.suction.transfer(pick, place, 10)
 ```
 
 Для установленного схвата вызов выглядит так.
 
 ```python
-robot.gripper.pick_and_place(pick, place, lift_mm=10)
+robot.gripper.transfer(pick, place, 10)
 ```
 
 Подбери `lift_mm` под свою рабочую зону. Высота перехода равна наибольшему Z

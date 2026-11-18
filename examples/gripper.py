@@ -2,12 +2,12 @@
 
 import argparse
 
-from dobot_usb import Dobot, Point
+from dobot_usb import Dobot, Point, connect
 
 
 def pick_and_place(robot: Dobot, pick: Point, place: Point, *, lift_mm: float) -> None:
     """Перенести предмет схватом. XYZ и подъём в миллиметрах, R в градусах."""
-    robot.gripper.pick_and_place(pick, place, lift_mm=lift_mm)
+    robot.gripper.transfer(pick, place, lift_mm)
 
 
 def main() -> None:
@@ -22,7 +22,7 @@ def main() -> None:
         help="подъём над точками старта, захвата и укладки в мм",
     )
     args = parser.parse_args()
-    with Dobot.connect(args.port) as robot:
+    with connect(args.port) as robot:
         pick_and_place(robot, Point(*args.pick), Point(*args.place), lift_mm=args.lift_mm)
         print("Перенос завершён. Управление губками отключено.")
 

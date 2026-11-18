@@ -1,5 +1,6 @@
 """Public workflows with a deterministic Magician simulator and no serial access."""
 
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 
@@ -122,13 +123,27 @@ def test_no_route_restart_after_interrupt_during_waypoint_preflight(
 
 def test_nested_sequence_cannot_restart_an_invalidated_outer_scope() -> None:
     with Dobot(SimulatedTransport()) as robot:
-        with robot.motion.sequence():
+        with robot.sequence():
             robot.stop()
             with pytest.raises(CommandInvalidated):
-                with robot.motion.sequence():
+                with robot.sequence():
                     robot.move_by(x=1)
         robot.move_by(x=1)
         assert robot.pose().x == 201
+
+
+def test_stop_during_iterable_route_prevents_motion() -> None:
+    sim = SimulatedTransport()
+    with Dobot(sim) as robot:
+
+        def waypoints() -> Iterator[Point]:
+            yield Point(201, 0, 50, 0)
+            robot.stop()
+            yield Point(202, 0, 50, 0)
+
+        with pytest.raises(CommandInvalidated):
+            robot.run(waypoints())
+        assert not any(frame.command == 84 for frame in sim.transactions)
 
 
 def test_empty_route_remains_an_offline_noop_after_close() -> None:

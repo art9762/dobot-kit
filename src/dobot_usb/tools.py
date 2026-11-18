@@ -230,7 +230,7 @@ class Tool(_Group):
         return self._current
 
     def offset(
-        self, *, x: float, y: float, z: float, wait: bool = True, timeout: float = 30.0
+        self, x: float, y: float, z: float, *, wait: bool = True, timeout: float = 30.0
     ) -> CommandHandle:
         """Set controller TCP bias in mm. No unmeasured defaults are substituted."""
         values: dict[str, object] = {

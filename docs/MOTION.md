@@ -1,20 +1,20 @@
 # Движение и маршруты
 
-Движение доступно сразу после подключения. Чтобы запомнить место захвата или касания, сохрани `start = robot.pose()`. Вызов `robot.move_to(start)` вернёт инструмент в XYZ и R этой позы. Для линейного смещения от неё используй `robot.move_by(z=2)`. Пользовательский код получает группу `robot.motion` из того же подключения. [Пример подключения и первого движения](../README.md)
+Движение доступно сразу после подключения. Чтобы запомнить место захвата или касания, сохрани `start = robot.pose()`. Вызов `robot.move(start)` вернёт инструмент в XYZ и R этой позы. Для линейного смещения от неё используй `robot.shift(z=2)`. Пользовательский код получает группу `robot.motion` из того же подключения. [Пример подключения и первого движения](../README.md)
 
 ## Основные вызовы
 
 | Метод | Единицы и поведение |
 | --- | --- |
-| `move_to(x, y, z, r=None, *, path='linear', wait=True, timeout=30)` | XYZ в мм, R в градусах; абсолютная цель |
-| `wait_for_pose(target: Point, *, timeout=5, linear_tolerance_mm=0.3, angular_tolerance_deg=0.65)` | Два последовательных наблюдения цели и отсутствие ошибок. Возвращает последнюю `Pose` |
-| `move_by(*, x=0, y=0, z=0, r=0, path='linear', wait=True, timeout=30)` | Смещение XYZ/R через относительный режим контроллера |
-| `move_joints(j1, j2, j3, j4, *, relative=False, wait=True, timeout=30)` | Абсолютные или относительные углы в градусах |
+| `move(x, y, z, r=None, *, path='linear', wait=True, timeout=30)` | XYZ в мм, R в градусах; абсолютная цель |
+| `wait_pose(target: Point, *, timeout=5, linear_tolerance_mm=0.3, angular_tolerance_deg=0.65)` | Два последовательных наблюдения цели и отсутствие ошибок. Возвращает последнюю `Pose` |
+| `shift(*, x=0, y=0, z=0, r=0, path='linear', wait=True, timeout=30)` | Смещение XYZ/R через относительный режим контроллера |
+| `joints(j1, j2, j3, j4, *, relative=False, wait=True, timeout=30)` | Абсолютные или относительные углы в градусах |
 | `home(*, wait=True, timeout=60)` | Явный homing, `reserved=0` |
-| `speed(*, mm_s, mm_s2, deg_s=None, deg_s2=None)` | Номинальные декартовы PTP скорости и ускорения |
+| `speed(mm_s, mm_s2, *, deg_s=None, deg_s2=None)` | Номинальные декартовы PTP скорости и ускорения |
 | `jump(*, height, z_limit)` | Высота подъёма и абсолютный максимальный Z в мм |
 | `arc(via: Point, to: Point, *, wait=True, timeout=30)` | Дуга от текущей позиции через via к to; обе точки имеют XYZ/R |
-| `line_to(x, y, z, *, velocity=0, wait=True, timeout=30)` | Абсолютная CP цель XYZ |
+| `line(x, y, z, *, velocity=0, wait=True, timeout=30)` | Абсолютная CP цель XYZ |
 | `line_by(*, x=0, y=0, z=0, velocity=0, wait=True, timeout=30)` | Относительная CP цель XYZ |
 
 При `r=None` сначала валидируются все переданные значения, затем выполняются
@@ -25,7 +25,7 @@
 Timeout применяется отдельно к барьеру и к записи/ожиданию backend, а не является
 единым сроком всего составного вызова.
 
-`path='linear'` — mode 2 (или 7 для `move_by`), `path='joint'` — 1 (или 8).
+`path='linear'` — mode 2 (или 7 для `shift`), `path='joint'` — 1 (или 8).
 `move_joints` использует 4, `relative=True` — 6. Относительный `path='jump'`
 отклоняется: в простой обёртке нет подтверждённого соответствующего режима.
 
@@ -108,7 +108,7 @@ robot.motion.jog("x", 1, duration=0.2)
 ## Маршруты пера / явных точек
 
 `Point(x, y, z, r)` всегда содержит R. `Path` неизменяемый; `then(point)` возвращает
-новый маршрут. В конструкторе проверяются все точки и копируется iterable.
+новый маршрут. Конструктор и `then` принимают `Point` и сохранённые `Pose`.
 `Bounds(minimum: Point, maximum: Point)` задаёт включительные границы XYZ/R.
 
 ```python
@@ -119,7 +119,7 @@ route = route.then(Point(190, 10, 90, 0))
 bounds = Bounds(Point(150, -30, 80, -90), Point(210, 30, 110, 90))
 preview = route.preview(bounds)  # Только CPU, без IO.
 assert preview.bounds == Bounds(Point(180, 0, 90, 0), Point(190, 10, 90, 0))
-# route.run(motion, bounds=bounds, wait=True, timeout=30)
+# В открытом соединении: robot.run(route, bounds=bounds)
 ```
 
 `preview` возвращает `Preview(points, bounds)` с фактическими extrema точек;
@@ -128,7 +128,7 @@ ValueError. Достижимость и свободный ход инструм
 границами между неизвестной начальной позой и целью.
 
 `run` проверяет options и весь маршрут до первого обращения к Motion, затем
-вызывает только линейные `move_to` с явным R. Возвращает tuple исходных handles.
+вызывает только линейные `move` с явным R. Возвращает tuple исходных handles.
 `timeout` — на каждую точку. `wait=False` не ждёт завершения; пользователь должен
 дождаться handles через исполнителя. При ошибке дальнейшие точки не отправляются,
 повторов/отката/автоматической очистки нет: уже отправленный префикс может
@@ -146,14 +146,14 @@ ValueError. Достижимость и свободный ход инструм
 `lift_mm`.
 
 ```python
-from dobot_usb import Dobot
+from dobot_usb import connect
 
 strokes = [[(0, 0), (5, 0)], [(0, 2), (5, 2)]]
 # До запуска выставь лёгкое касание закреплённого листа.
 port = input("Порт руки: ").strip()
-with Dobot.connect(port) as robot:
+with connect(port) as robot:
     contact = robot.pose()
-    report = robot.pen.draw(strokes, origin=contact, dry_run=True)
+    report = robot.draw(strokes, contact, dry_run=True)
     print(report.completed_points, report.checkpoints[-1].actual.z)
 ```
 
@@ -161,7 +161,7 @@ with Dobot.connect(port) as robot:
 `origin`. Заранее выбери подходящую скорость и обеспечь единоличное управление
 очередью на время рисунка, в том числе среди потоков программы.
 
-`robot.pen.draw(strokes, *, origin, lift_mm=3, dry_run=False, bounds=None, timeout=30)`
+`robot.draw(strokes, origin, *, lift_mm=3, dry_run=False, bounds=None, timeout=30)`
 дожидается уже отправленных этим клиентом команд, проверяет отключение управления
 и активации лазера, схвата и присоски, читает стартовую позу и строит весь маршрут.
 Перед первым движением метод проверяет стартовую позу двумя чтениями. Для каждой

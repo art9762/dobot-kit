@@ -2,6 +2,8 @@
 
 import math
 import struct
+from collections.abc import Iterable, Sequence
+from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import cast
 
@@ -12,7 +14,8 @@ from .errors import ConnectionError, ProtocolError, RobotAlarmError, Unsupported
 from .execution import CommandExecutor, CommandHandle
 from .models import DeviceInfo, Point, Pose, Status, ToolState
 from .motion import Motion
-from .pen import Pen
+from .paths import Bounds, Path
+from .pen import Pen, PenReport
 from .peripherals import IO, Motors, Network, Rail, Sensors, Settings, Teaching
 from .queue import Queue
 from .tools import Laser, Tool
@@ -110,6 +113,19 @@ class Dobot:
             sequence=self._executor.sequence,
         )
 
+    @property
+    def cmd(self) -> Advanced:
+        """Named protocol commands for the current connection."""
+        return self.advanced
+
+    @property
+    def teach(self) -> Teaching:
+        return self.teaching
+
+    @property
+    def wifi(self) -> Network:
+        return self.network
+
     @classmethod
     def connect(cls, port: str, *, timeout: float = 1.0, read_only: bool = False) -> "Dobot":
         """Open an explicit port and verify version/pose/alarms using queries only.
@@ -176,14 +192,55 @@ class Dobot:
             j1, j2, j3, j4, relative=relative, wait=wait, timeout=timeout
         )
 
+    move = move_to
+    shift = move_by
+    joints = move_joints
+
+    def sequence(self) -> AbstractContextManager[None]:
+        """Keep a multi-step action bound to one uninterrupted queue generation."""
+        return self.motion.sequence()
+
+    def wait(self, *, timeout: float = 30.0) -> None:
+        """Wait for this client's last accepted queued command."""
+        self.queue.wait(timeout=timeout)
+
+    def run(
+        self,
+        route: Path | Iterable[Point | Pose],
+        *,
+        bounds: Bounds | None = None,
+        wait: bool = True,
+        timeout: float = 30.0,
+    ) -> tuple[CommandHandle, ...]:
+        """Execute a Path or a sequence of absolute points and saved poses."""
+        if isinstance(route, Path):
+            return route.run(self.motion, bounds=bounds, wait=wait, timeout=timeout)
+        with self.sequence():
+            return Path(route).run(self.motion, bounds=bounds, wait=wait, timeout=timeout)
+
+    def draw(
+        self,
+        strokes: Iterable[Iterable[Sequence[float]]],
+        origin: Point | Pose,
+        *,
+        lift_mm: float = 3.0,
+        dry_run: bool = False,
+        bounds: Bounds | None = None,
+        timeout: float = 30.0,
+    ) -> PenReport:
+        """Draw XY strokes from a taught paper-contact pose, with lifts between them."""
+        return self.pen.draw(
+            strokes, origin=origin, lift_mm=lift_mm, dry_run=dry_run, bounds=bounds, timeout=timeout
+        )
+
     def home(self, *, wait: bool = True, timeout: float = 60.0) -> CommandHandle:
         return self.motion.home(wait=wait, timeout=timeout)
 
     def speed(
         self,
-        *,
         mm_s: float,
         mm_s2: float,
+        *,
         deg_s: float | None = None,
         deg_s2: float | None = None,
     ) -> CommandHandle:
@@ -221,6 +278,8 @@ class Dobot:
             serial_number=cast(str | None, self.advanced.get("device_sn")["serial_number"]),
             name=cast(str | None, self.advanced.get("device_name")["name"]),
         )
+
+    info = device_info
 
     def status(self) -> Status:
         """Read identity, pose and alarms in sequence; does not probe attached tools."""
@@ -260,4 +319,9 @@ class Dobot:
         self.close()
 
 
-__all__ = ["Advanced", "Dobot", "ConnectionError"]
+def connect(port: str, *, timeout: float = 1.0, read_only: bool = False) -> Dobot:
+    """Open a classic Magician on the selected port and perform a read-only handshake."""
+    return Dobot.connect(port, timeout=timeout, read_only=read_only)
+
+
+__all__ = ["Advanced", "Dobot", "ConnectionError", "connect"]

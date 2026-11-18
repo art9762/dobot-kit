@@ -158,7 +158,7 @@ def test_unconfirmed_vacuum_stops_in_place_after_single_grasp(monkeypatch):
 @pytest.mark.parametrize("script", ["pick_and_place", "gripper"])
 def test_example_entry_point_uses_selected_head_without_clearing(monkeypatch, script):
     sim = SimulatedTransport()
-    monkeypatch.setattr(Dobot, "connect", lambda port: Dobot(sim))
+    monkeypatch.setattr("dobot_usb.client.SerialTransport", lambda port, **options: sim)
     if script == "gripper":
         monkeypatch.setattr(
             sys,

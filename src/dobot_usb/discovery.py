@@ -17,3 +17,6 @@ def discover() -> list[PortInfo]:
         for p in list_ports.comports()
         if (p.vid, p.pid) in candidates
     ]
+
+
+ports = discover
