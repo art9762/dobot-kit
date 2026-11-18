@@ -1,6 +1,6 @@
 """Read the selected arm without starting motion or changing outputs."""
 
-from dobotkit import Dobot
+from dobot_usb import Dobot
 
 if __name__ == "__main__":
     port = input("Порт из dobot ports: ").strip()

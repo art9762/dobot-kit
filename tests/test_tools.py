@@ -4,9 +4,9 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from dobotkit.errors import ConnectionError, ProtocolError, RequestTimeout
-from dobotkit.models import ToolState
-from dobotkit.tools import Gripper, Laser, LaserNotArmed, Suction, Tool, ToolOffset
+from dobot_usb.errors import ConnectionError, ProtocolError, RequestTimeout
+from dobot_usb.models import ToolState
+from dobot_usb.tools import Gripper, Laser, LaserNotArmed, Suction, Tool, ToolOffset
 
 
 @dataclass

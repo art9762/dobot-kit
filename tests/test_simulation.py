@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 import pytest
 
-from dobotkit.errors import ConnectionError, UnsupportedCommand
-from dobotkit.protocol import Frame
+from dobot_usb.errors import ConnectionError, UnsupportedCommand
+from dobot_usb.protocol import Frame
 
 from .simulation import SimulatedTransport
 
@@ -126,7 +126,7 @@ ADDRESS_GETS = {130, 131, 132, 133, 134}
 
 
 def test_construction_and_reads_never_open_usb_or_start_queue() -> None:
-    with patch("dobotkit.transport.serial.Serial", side_effect=AssertionError("USB opened")):
+    with patch("dobot_usb.transport.serial.Serial", side_effect=AssertionError("USB opened")):
         sim = SimulatedTransport()
         assert sim.requests == sim.transactions == []
         assert not sim.closed and not sim.running
@@ -495,9 +495,9 @@ def test_relative_float32_overflow_does_not_partially_update_pose_or_rail() -> N
 
 def test_canonical_registry_defaults_and_set_contract_after_integration() -> None:
     try:
-        registry = importlib.import_module("dobotkit.commands").COMMANDS
+        registry = importlib.import_module("dobot_usb.commands").COMMANDS
     except ModuleNotFoundError as exc:
-        if exc.name != "dobotkit.commands":
+        if exc.name != "dobot_usb.commands":
             raise
         pytest.skip("commands.py belongs to a separate clone until root integration")
     sim = SimulatedTransport()

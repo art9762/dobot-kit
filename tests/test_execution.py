@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from dobotkit.errors import (
+from dobot_usb.errors import (
     CommandInvalidated,
     ConnectionError,
     ExecutionTimeout,
@@ -17,7 +17,7 @@ from dobotkit.errors import (
     RequestTimeout,
     RobotAlarmError,
 )
-from dobotkit.execution import CommandExecutor, ExecutionState
+from dobot_usb.execution import CommandExecutor, ExecutionState
 
 MASK = 2**64 - 1
 

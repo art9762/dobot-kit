@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from dobotkit import Dobot
-from dobotkit.errors import ProtocolError, RequestTimeout, RobotAlarmError
-from dobotkit.peripherals import (
+from dobot_usb import Dobot
+from dobot_usb.errors import ProtocolError, RequestTimeout, RobotAlarmError
+from dobot_usb.peripherals import (
     IO,
     AngleSensorErrors,
     HomePosition,
@@ -22,7 +22,7 @@ from dobotkit.peripherals import (
     TeachingMode,
     VelocityRatios,
 )
-from dobotkit.tools import ToolOffset
+from dobot_usb.tools import ToolOffset
 
 from .simulation import SimulatedTransport
 from .test_tools import FakeBackend

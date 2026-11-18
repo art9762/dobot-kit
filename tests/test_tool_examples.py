@@ -5,7 +5,7 @@ from runpy import run_path
 
 import pytest
 
-from dobotkit import CommandInvalidated, Dobot, Point, ToolState
+from dobot_usb import CommandInvalidated, Dobot, Point, ToolState
 
 from .simulation import SimulatedTransport
 

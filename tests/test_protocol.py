@@ -1,7 +1,7 @@
 import pytest
 
-from dobotkit.errors import ProtocolError
-from dobotkit.protocol import MAX_FRAME_SIZE, Frame, FrameParser, encode
+from dobot_usb.errors import ProtocolError
+from dobot_usb.protocol import MAX_FRAME_SIZE, Frame, FrameParser, encode
 
 
 def test_known_pose_query_packet() -> None:

@@ -5,8 +5,8 @@ from typing import Any
 
 import pytest
 
-from dobotkit.models import Point, Pose
-from dobotkit.motion import Motion, PTPMode
+from dobot_usb.models import Point, Pose
+from dobot_usb.motion import Motion, PTPMode
 
 
 @dataclass
@@ -262,7 +262,7 @@ def test_bounded_jog_always_stops(
 ) -> None:
     motion, _, events = setup
     monkeypatch.setattr(
-        "dobotkit.motion.time.sleep", lambda seconds: events.append(("sleep", seconds))
+        "dobot_usb.motion.time.sleep", lambda seconds: events.append(("sleep", seconds))
     )
     motion.jog(axis, direction, duration=0.1, timeout=2)
     assert events[:2] == [("sync", 2), "ready"]
@@ -288,7 +288,7 @@ def test_jog_interruption_attempts_stop(setup: Any, monkeypatch: pytest.MonkeyPa
     def interrupted(_: float) -> None:
         raise KeyboardInterrupt
 
-    monkeypatch.setattr("dobotkit.motion.time.sleep", interrupted)
+    monkeypatch.setattr("dobot_usb.motion.time.sleep", interrupted)
     with pytest.raises(KeyboardInterrupt):
         motion.jog("x", 1, duration=0.1)
     assert events[-1][2]["cmd"] == 0

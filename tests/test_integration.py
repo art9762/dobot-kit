@@ -4,7 +4,7 @@ import struct
 
 import pytest
 
-from dobotkit import (
+from dobot_usb import (
     CommandInvalidated,
     Dobot,
     ExecutionState,
@@ -15,8 +15,8 @@ from dobotkit import (
     RobotAlarmError,
     UnsupportedCommand,
 )
-from dobotkit.protocol import Frame, FrameParser, encode
-from dobotkit.tools import LaserNotArmed
+from dobot_usb.protocol import Frame, FrameParser, encode
+from dobot_usb.tools import LaserNotArmed
 
 from .simulation import SimulatedTransport
 
@@ -196,7 +196,7 @@ def test_complete_client_over_binary_serial_frames(monkeypatch: pytest.MonkeyPat
             del self.buffer[:size]
             return result
 
-    monkeypatch.setattr("dobotkit.transport.serial.Serial", WireSerial)
+    monkeypatch.setattr("dobot_usb.transport.serial.Serial", WireSerial)
     with Dobot.connect("mock-binary-port", timeout=0.1) as robot:
         assert not any(f.control & 1 for f in controller.transactions)
         robot.move_to(210, 5, 70, r=2, timeout=0.2)

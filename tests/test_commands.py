@@ -6,9 +6,9 @@ from ipaddress import IPv4Address
 
 import pytest
 
-from dobotkit.commands import COMMANDS, PTPMode
-from dobotkit.errors import ProtocolError, UnsupportedCommand
-from dobotkit.protocol import Frame, encode
+from dobot_usb.commands import COMMANDS, PTPMode
+from dobot_usb.errors import ProtocolError, UnsupportedCommand
+from dobot_usb.protocol import Frame, encode
 
 # Independently stated wire examples for every supported SET. Float words are
 # IEEE754 little endian: 1=0000803f, 2=00000040, 3=00004040, 4=00008040.

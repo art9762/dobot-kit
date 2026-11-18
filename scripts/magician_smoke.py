@@ -5,7 +5,7 @@ import json
 from dataclasses import asdict
 from math import dist
 
-from dobotkit import Dobot, PenCheckpoint, Point, Pose, RobotAlarmError
+from dobot_usb import Dobot, PenCheckpoint, Point, Pose, RobotAlarmError
 
 SLOW: dict[str, dict[str, object]] = {
     "ptp_joint_params": {"velocity": (5.0,) * 4, "acceleration": (10.0,) * 4},

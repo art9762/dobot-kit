@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from dobotkit import (
+from dobot_usb import (
     Bounds,
     CommandInvalidated,
     Dobot,
@@ -18,7 +18,7 @@ from dobotkit import (
     Point,
     Pose,
 )
-from dobotkit.pen import pen_path
+from dobot_usb.pen import pen_path
 
 from .simulation import SimulatedTransport
 

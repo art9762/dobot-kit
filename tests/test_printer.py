@@ -5,7 +5,7 @@ from collections import deque
 
 import pytest
 
-from dobotkit.printing import Printer, PrinterError, PrintResult, Temperature
+from dobot_usb.printing import Printer, PrinterError, PrintResult, Temperature
 
 INFO = b"FIRMWARE_NAME:Marlin V1 PROTOCOL_VERSION:1.0 MACHINE_TYPE:Generic\nCap:EEPROM:0\nok\n"
 TEMP = b"ok T:199.25 /200.0 B:0.0 /0.0 @:0\n"
@@ -72,7 +72,7 @@ def wire(monkeypatch):
         assert kwargs["port"] is None and kwargs["baudrate"] == 115200
         return script
 
-    monkeypatch.setattr("dobotkit.printer.serial.Serial", construct)
+    monkeypatch.setattr("dobot_usb.printer.serial.Serial", construct)
     return script
 
 

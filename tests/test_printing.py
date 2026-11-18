@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from dobotkit.printing import PrintJob, inspect_gcode, open_print_job
+from dobot_usb.printing import PrintJob, inspect_gcode, open_print_job
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def test_reject_bad_file_before_host_launch(
     source = tmp_path / name
     source.write_bytes(content)
     with (
-        patch("dobotkit.printing.subprocess.Popen") as launch,
+        patch("dobot_usb.printing.subprocess.Popen") as launch,
         pytest.raises(ValueError, match=message),
     ):
         open_print_job(source, application=tmp_path / "not-installed")
@@ -56,8 +56,8 @@ def test_open_print_job_in_cura_on_mac(
 ) -> None:
     app = tmp_path / "UltiMaker Cura.app"
     app.mkdir()
-    monkeypatch.setattr("dobotkit.printing.sys.platform", "darwin")
-    with patch("dobotkit.printing.subprocess.run") as launch:
+    monkeypatch.setattr("dobot_usb.printing.sys.platform", "darwin")
+    with patch("dobot_usb.printing.subprocess.run") as launch:
         job = open_print_job(sliced_file, application=app)
     launch.assert_called_once_with(
         ["/usr/bin/open", "-a", str(app.resolve()), str(sliced_file.resolve())], check=True
@@ -71,8 +71,8 @@ def test_open_print_job_in_windows_host(
     host = tmp_path / "RepetierHost.exe"
     host.touch()
     host.chmod(0o755)
-    monkeypatch.setattr("dobotkit.printing.sys.platform", "win32")
-    with patch("dobotkit.printing.subprocess.Popen") as launch:
+    monkeypatch.setattr("dobot_usb.printing.sys.platform", "win32")
+    with patch("dobot_usb.printing.subprocess.Popen") as launch:
         job = open_print_job(sliced_file, application=host)
     launch.assert_called_once_with([str(host.resolve()), str(sliced_file.resolve())])
     assert job.path == sliced_file.resolve()
@@ -82,13 +82,14 @@ def test_handoff_reports_missing_host_and_launcher_errors(
     sliced_file: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     app = tmp_path / "Cura.app"
-    monkeypatch.setattr("dobotkit.printing.sys.platform", "darwin")
+    monkeypatch.setattr("dobot_usb.printing.sys.platform", "darwin")
     with pytest.raises(FileNotFoundError):
         open_print_job(sliced_file, application=app)
     app.mkdir()
     with (
         patch(
-            "dobotkit.printing.subprocess.run", side_effect=subprocess.CalledProcessError(1, "open")
+            "dobot_usb.printing.subprocess.run",
+            side_effect=subprocess.CalledProcessError(1, "open"),
         ),
         pytest.raises(subprocess.CalledProcessError),
     ):

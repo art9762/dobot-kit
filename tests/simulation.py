@@ -5,9 +5,9 @@ import struct
 import threading
 from collections import deque
 
-from dobotkit.errors import ConnectionError, UnsupportedCommand
-from dobotkit.protocol import Frame
-from dobotkit.transport import READ_ONLY_COMMANDS
+from dobot_usb.errors import ConnectionError, UnsupportedCommand
+from dobot_usb.protocol import Frame
+from dobot_usb.transport import READ_ONLY_COMMANDS
 
 # Explicit SET wire layouts. Never infer these from GET sizes: several differ.
 _SET_FORMATS = {

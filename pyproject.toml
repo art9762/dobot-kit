@@ -3,8 +3,8 @@ requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 [project]
-name = "dobot-kit"
-version = "0.2.0a2"
+name = "dobot-usb"
+version = "0.2.0a3"
 description = "A small Python interface for classic DOBOT Magician robots"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -28,13 +28,13 @@ Issues = "https://github.com/art9762/dobot-kit/issues"
 Releases = "https://github.com/art9762/dobot-kit/releases"
 
 [project.scripts]
-dobot = "dobotkit.cli:main"
+dobot = "dobot_usb.cli:main"
 
 [dependency-groups]
 dev = ["build>=1.2,<2", "pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2", "types-pyserial>=3.5,<4"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/dobotkit"]
+packages = ["src/dobot_usb"]
 
 [tool.hatch.build.targets.sdist]
 include = ["/src", "/examples", "/docs", "/scripts/magician_smoke.py", "/README.md", "/LICENSE"]
@@ -54,4 +54,4 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src/dobotkit"]
+files = ["src/dobot_usb"]

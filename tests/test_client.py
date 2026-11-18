@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from dobotkit import ConnectionError, Dobot, ProtocolError, UnsupportedCommand
-from dobotkit.cli import main
-from dobotkit.discovery import discover
+from dobot_usb import ConnectionError, Dobot, ProtocolError, UnsupportedCommand
+from dobot_usb.cli import main
+from dobot_usb.discovery import discover
 
 from .simulation import SimulatedTransport
 
@@ -153,7 +153,7 @@ def test_advanced_rejects_unenabled_commands_without_io(command: int) -> None:
 def test_handshake_failure_releases_port() -> None:
     transport = SimulatedTransport()
     transport.responses[10] = b""
-    with patch("dobotkit.client.SerialTransport", return_value=transport):
+    with patch("dobot_usb.client.SerialTransport", return_value=transport):
         with pytest.raises(ProtocolError):
             Dobot.connect("mock-port")
     assert transport.closed
@@ -161,7 +161,7 @@ def test_handshake_failure_releases_port() -> None:
 
 def test_successful_handshake_uses_queries_only() -> None:
     transport = SimulatedTransport()
-    with patch("dobotkit.client.SerialTransport", return_value=transport) as factory:
+    with patch("dobot_usb.client.SerialTransport", return_value=transport) as factory:
         with Dobot.connect("mock-port", timeout=0.2):
             pass
     factory.assert_called_once_with("mock-port", timeout=0.2, allow_writes=True)
@@ -170,7 +170,7 @@ def test_successful_handshake_uses_queries_only() -> None:
 
 def test_cli_status_opens_the_named_port_read_only(capsys: pytest.CaptureFixture[str]) -> None:
     transport = SimulatedTransport(allow_writes=False)
-    with patch("dobotkit.client.SerialTransport", return_value=transport) as factory:
+    with patch("dobot_usb.client.SerialTransport", return_value=transport) as factory:
         assert main(["status", "--port", "mock-port", "--timeout", "0.2"]) == 0
     factory.assert_called_once_with("mock-port", timeout=0.2, allow_writes=False)
     output = json.loads(capsys.readouterr().out)
@@ -203,7 +203,7 @@ def test_discovery_only_enumerates() -> None:
         device="mock-port", description="USB", vid=0x1A86, pid=0x55D4, serial_number=None
     )
     with (
-        patch("dobotkit.discovery.list_ports.comports", return_value=[candidate]),
-        patch("dobotkit.transport.serial.Serial", side_effect=AssertionError("USB opened")),
+        patch("dobot_usb.discovery.list_ports.comports", return_value=[candidate]),
+        patch("dobot_usb.transport.serial.Serial", side_effect=AssertionError("USB opened")),
     ):
         assert discover()[0].device == "mock-port"

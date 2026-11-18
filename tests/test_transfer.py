@@ -7,7 +7,15 @@ from runpy import run_path
 
 import pytest
 
-from dobotkit import CommandInvalidated, Dobot, DobotError, ExecutionTimeout, Point, Pose, ToolState
+from dobot_usb import (
+    CommandInvalidated,
+    Dobot,
+    DobotError,
+    ExecutionTimeout,
+    Point,
+    Pose,
+    ToolState,
+)
 
 from .simulation import SimulatedTransport
 

@@ -1,6 +1,6 @@
 """Перенести предмет присоской между двумя точками, обученными вручную."""
 
-from dobotkit import Dobot
+from dobot_usb import Dobot
 
 
 def main() -> None:

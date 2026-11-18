@@ -5,8 +5,8 @@ from typing import Any
 
 import pytest
 
-from dobotkit.models import Point
-from dobotkit.paths import Bounds, Path
+from dobot_usb.models import Point
+from dobot_usb.paths import Bounds, Path
 
 
 class FakeMotion:

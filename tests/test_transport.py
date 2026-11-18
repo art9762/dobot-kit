@@ -4,10 +4,10 @@ from typing import Any
 import pytest
 import serial
 
-from dobotkit import transport
-from dobotkit.errors import ConnectionError, ProtocolError, RequestTimeout, UnsupportedCommand
-from dobotkit.protocol import Frame, FrameParser, encode
-from dobotkit.transport import READ_ONLY_COMMANDS, SerialTransport
+from dobot_usb import transport
+from dobot_usb.errors import ConnectionError, ProtocolError, RequestTimeout, UnsupportedCommand
+from dobot_usb.protocol import Frame, FrameParser, encode
+from dobot_usb.transport import READ_ONLY_COMMANDS, SerialTransport
 
 
 class FakeSerial:

@@ -1,6 +1,6 @@
 """Teach Cartesian waypoints by hand. Preview before choosing to run the route."""
 
-from dobotkit import Dobot, Path, Point
+from dobot_usb import Dobot, Path, Point
 
 if __name__ == "__main__":
     port = input("Порт руки: ").strip()

@@ -5,7 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from dobotkit import Dobot, ExecutionTimeout, Point, Pose, RobotAlarmError
+from dobot_usb import Dobot, ExecutionTimeout, Point, Pose, RobotAlarmError
 
 from .simulation import SimulatedTransport
 
@@ -30,7 +30,7 @@ def test_confirmation_uses_consecutive_matching_stable_samples(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     clock = Clock()
-    monkeypatch.setattr("dobotkit.motion.time", clock)
+    monkeypatch.setattr("dobot_usb.motion.time", clock)
     transport = SimulatedTransport(allow_writes=False)
     # Euclidean distance, a single good sample, R mismatch, then a jump across
     # the tolerance band. Only the final pair matches both target and each other.
@@ -62,7 +62,7 @@ def test_confirmation_uses_consecutive_matching_stable_samples(
 
 def test_alarm_blocks_confirmation_on_final_sample(monkeypatch: pytest.MonkeyPatch) -> None:
     clock = Clock()
-    monkeypatch.setattr("dobotkit.motion.time", clock)
+    monkeypatch.setattr("dobot_usb.motion.time", clock)
     transport = SimulatedTransport(allow_writes=False)
     transport.responses[10] = packet()
 
@@ -79,7 +79,7 @@ def test_alarm_blocks_confirmation_on_final_sample(monkeypatch: pytest.MonkeyPat
 
 def test_no_success_after_deadline_crossed_by_alarm_query(monkeypatch: pytest.MonkeyPatch) -> None:
     clock = Clock()
-    monkeypatch.setattr("dobotkit.motion.time", clock)
+    monkeypatch.setattr("dobot_usb.motion.time", clock)
     transport = SimulatedTransport(allow_writes=False)
     transport.responses[10] = packet()
     get = transport.request

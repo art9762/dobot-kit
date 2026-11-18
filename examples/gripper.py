@@ -2,7 +2,7 @@
 
 import argparse
 
-from dobotkit import Dobot, Point
+from dobot_usb import Dobot, Point
 
 
 def pick_and_place(robot: Dobot, pick: Point, place: Point, *, lift_mm: float) -> None:

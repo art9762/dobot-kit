@@ -4,7 +4,7 @@ import argparse
 import math
 import struct
 
-from dobotkit import Dobot, Point, ToolState
+from dobot_usb import Dobot, Point, ToolState
 
 
 def mark_line(robot: Dobot, dx_mm: float, dy_mm: float) -> None:

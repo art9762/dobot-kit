@@ -5,7 +5,7 @@ from threading import Event
 
 import pytest
 
-from dobotkit import CommandInvalidated, Dobot, ExecutionState, ExecutionTimeout, Path, Point
+from dobot_usb import CommandInvalidated, Dobot, ExecutionState, ExecutionTimeout, Path, Point
 
 from .simulation import SimulatedTransport
 
