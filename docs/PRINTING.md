@@ -5,7 +5,7 @@
 Подготовьте штатную головку, переведите Magician в **3D Printer Firmware** и задайте ноль рабочего стола согласно руководству. Нарежьте модель с профилем Magician. Передайте программе путь к текстовому `.gcode` и порт именно этого контроллера. Порт должен быть свободен для подключения. [Dobot Magician User Guide V1.7.0, §5.9](https://download.dobot.cc/product-manual/dobot-magician/pdf/V1.7.0/en/Dobot-Magician-User-Guide-V1.7.0.pdf)
 
 ```python
-from dobotkit.printing import Printer
+from dobot_usb.printing import Printer
 
 port = input("Порт принтера: ").strip()
 with Printer.connect(port) as printer:
@@ -42,7 +42,7 @@ with Printer.connect(port) as printer:
 Если уже есть нарезанный для Magician файл `.gcode`, Python может открыть его в программе печати. На macOS руководство Dobot указывает Cura. На Windows поддерживаются Repetier-Host и Cura. Установите выбранное приложение отдельно и укажите путь к нему. [Dobot Magician User Guide V1.7.0, §5.9](https://download.dobot.cc/product-manual/dobot-magician/pdf/V1.7.0/en/Dobot-Magician-User-Guide-V1.7.0.pdf)
 
 ```python
-from dobotkit.printing import open_print_job
+from dobot_usb.printing import open_print_job
 
 job = open_print_job("part.gcode", application="/Applications/UltiMaker Cura.app")
 print(job.motion_commands, job.extruder_moves)
@@ -55,7 +55,7 @@ print(job.motion_commands, job.extruder_moves)
 ## Содержимое задания
 
 ```python
-from dobotkit.printing import inspect_gcode
+from dobot_usb.printing import inspect_gcode
 
 job = inspect_gcode("part.gcode")
 print(job.path, job.commands, job.motion_commands, job.extruder_moves)

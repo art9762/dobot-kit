@@ -149,7 +149,7 @@ forward progress cannot be distinguished by this protocol; sole queue ownership,
 
 `DobotError` now has `stage` (`outcome` alias), `command`, `queue_index`, and `session_id`.
 New errors are `ExecutionTimeout`, `CommandInvalidated`, `RobotAlarmError`, `OutcomeUnknown`.
-They are exported from `dobotkit` along with `ExecutionState` and `CommandHandle`.
+They are exported from `dobot_usb` along with `ExecutionState` and `CommandHandle`.
 
 | Stage | Evidence |
 | --- | --- |

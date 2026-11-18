@@ -1,6 +1,6 @@
 # Справочник Python API
 
-`Dobot`, `Point`, `Pose`, `Path`, `Bounds`, `pen_path` и `discover` импортируются из `dobotkit`. Ниже `robot` обозначает открытое соединение с одним классическим Magician. Расстояния указаны в мм, углы в градусах, длительности в секундах. [Примеры использования](API.md)
+`Dobot`, `Point`, `Pose`, `Path`, `Bounds`, `pen_path` и `discover` импортируются из `dobot_usb`. Ниже `robot` обозначает открытое соединение с одним классическим Magician. Расстояния указаны в мм, углы в градусах, длительности в секундах. [Примеры использования](API.md)
 
 ## Подключение и чтение
 
@@ -109,7 +109,7 @@ robot.gripper.pick_and_place(pick: Point | Pose, place: Point | Pose, *, lift_mm
 
 Для штатной печатающей головки применяется отдельный режим **3D Printer Firmware**. Подключение принтера, работа с готовым заданием и запуск через Python описаны в [руководстве по печати](PRINTING.md).
 
-Импортируй `Printer` из `dobotkit.printing`. Открывай соединение через `with Printer.connect(port, timeout=5.0) as printer:`.
+Импортируй `Printer` из `dobot_usb.printing`. Открывай соединение через `with Printer.connect(port, timeout=5.0) as printer:`.
 
 | Вызов | Результат |
 | --- | --- |
@@ -117,11 +117,11 @@ robot.gripper.pick_and_place(pick: Point | Pose, place: Point | Pose, *, lift_mm
 | `printer.temperature()` | `Temperature(current_c, target_c)` в °C. Уставка может быть `None` |
 | `printer.print_file(path, wait_timeout=300.0)` | `PrintResult(path, acknowledged_commands)` после подтверждения строк и завершения очереди движений прошивки |
 
-`dobotkit.printing.inspect_gcode(path)` проверяет структуру нарезанного файла и возвращает `PrintJob(path, commands, motion_commands, extruder_moves)`. Счётчик `extruder_moves` учитывает команды движения с параметром E, включая ретракты. Если нужно открыть файл в установленном хосте, вызовите `dobotkit.printing.open_print_job(path, application=...)`. Дальнейшим запуском задания и портом в этом режиме управляет хост.
+`dobot_usb.printing.inspect_gcode(path)` проверяет структуру нарезанного файла и возвращает `PrintJob(path, commands, motion_commands, extruder_moves)`. Счётчик `extruder_moves` учитывает команды движения с параметром E, включая ретракты. Если нужно открыть файл в установленном хосте, вызовите `dobot_usb.printing.open_print_job(path, application=...)`. Дальнейшим запуском задания и портом в этом режиме управляет хост.
 
 ## Периферия и настройки
 
-Методы ниже вызываются у соответствующего объекта открытого соединения. Типы `IOFunction` и `TeachingMode` импортируются из `dobotkit.peripherals`. [Диапазоны, единицы и форматы результатов](PERIPHERALS.md)
+Методы ниже вызываются у соответствующего объекта открытого соединения. Типы `IOFunction` и `TeachingMode` импортируются из `dobot_usb.peripherals`. [Диапазоны, единицы и форматы результатов](PERIPHERALS.md)
 
 ### `robot.io`
 

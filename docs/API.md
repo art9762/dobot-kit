@@ -1,4 +1,4 @@
-# API Dobot Kit 0.2.0a2
+# API Dobot Kit 0.2.0a3
 
 Документация для классического DOBOT Magician. Для проверенной конфигурации и
 подтверждённых режимов см. [аппаратный отчёт](HARDWARE.md).
@@ -6,7 +6,7 @@
 ## Обычная программа
 
 ```python
-from dobotkit import Dobot
+from dobot_usb import Dobot
 
 port = input("Порт из dobot ports: ").strip()
 with Dobot.connect(port, read_only=True) as robot:
@@ -77,7 +77,7 @@ CP `velocity` — зарезервированный аргумент, допу�
   [операции и единицы](PERIPHERALS.md).
 - `conveyor.configure(index=0,steps_per_mm=...)` сохраняет измеренную калибровку без IO;
   после этого `conveyor.run(mm_s)` переводит скорость в шаги/с. `conveyor.stop()` отключает мотор.
-- Для принтерной прошивки используй `from dobotkit.printing import Printer` и отдельное соединение `Printer.connect(port)`. Оно читает температуру и принимает готовый файл через `print_file()`. [Формат и пример](PRINTING.md)
+- Для принтерной прошивки используй `from dobot_usb.printing import Printer` и отдельное соединение `Printer.connect(port)`. Оно читает температуру и принимает готовый файл через `print_file()`. [Формат и пример](PRINTING.md)
 
 Отдельные команды движения и управления выходами возвращают `CommandHandle`. Завершившийся перенос возвращает `None`, рисование возвращает `PenReport`. Состояние контроллера не доказывает реальное удержание
 предмета или присутствие инструмента. Для неизвестной клешни значения состояний
@@ -126,7 +126,7 @@ queue_index и session_id, когда они известны. Неправил�
 Каждый вызов `Dobot.connect` открывает один выбранный порт. `dobot ports` показывает поле `device` у кандидатов. При первом подключении сопоставь каждую руку с портом, подключая по одной. После перестановки USB проверь соответствие снова. Независимые объекты удобно называть по роли руки.
 
 ```python
-from dobotkit import Dobot
+from dobot_usb import Dobot
 
 left_port = input("Порт левой руки: ").strip()
 right_port = input("Порт правой руки: ").strip()

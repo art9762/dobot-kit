@@ -32,28 +32,28 @@
     </nav>
     <nav class="secondary-nav" aria-label="Справочник">
       <p class="nav-title">Справочник</p>
-      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/API-REFERENCE.md">Методы Python ↗</a>
-      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/HARDWARE.md">Испытания на руке ↗</a>
-      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/SOURCES.md">Источники ↗</a>
+      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a3/docs/API-REFERENCE.md">Методы Python ↗</a>
+      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a3/docs/HARDWARE.md">Испытания на руке ↗</a>
+      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a3/docs/SOURCES.md">Источники ↗</a>
     </nav>
   </aside>
   <main class="article" id="main">
     <div class="intro">
-      <p class="breadcrumb">Документация <span aria-hidden="true">/</span> <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a2">v0.2.0a2</a></p>
+      <p class="breadcrumb">Документация <span aria-hidden="true">/</span> <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a3">v0.2.0a3</a></p>
       <h1>Первое подключение</h1>
       <p class="lead">Установи Dobot Kit, подключи классический DOBOT Magician по USB и прочитай координаты руки из Python.</p>
       <figure class="connection" aria-label="Схема соединения">
-        <div class="endpoint"><strong>Python</strong><span>dobotkit</span></div>
+        <div class="endpoint"><strong>Python</strong><span>dobot_usb</span></div>
         <div class="link-wire"><span>USB</span></div>
         <div class="endpoint"><strong>Magician</strong><span>контроллер</span></div>
       </figure>
     </div>
     <section id="install">
       <h2>Установка</h2>
-      <p>Открой терминал в своём окружении с Python 3.11 или новее. Команда скачает готовый пакет с GitHub и установит <code>pyserial</code> для работы с портом.</p>
+      <p>Открой терминал в своём окружении с Python 3.11 или новее. Команда установит <a href="https://pypi.org/project/dobot-usb/">dobot-usb с PyPI</a> и <code>pyserial</code> для работы с портом.</p>
       <div class="codeblock">
         <div class="code-head"><span>Терминал</span></div>
-        <pre><code>python -m pip install https://github.com/art9762/dobot-kit/releases/download/v0.2.0a2/dobot_kit-0.2.0a2-py3-none-any.whl</code></pre>
+        <pre><code>pip install dobot-usb</code></pre>
       </div>
       <details>
         <summary>Как создать окружение Python</summary>
@@ -84,7 +84,7 @@ source .venv/bin/activate</code></pre>
       <p>Сохрани код в <code>arm.py</code> и запусти <code>python arm.py</code>. Вставь имя своего порта, когда программа попросит. Режим <code>read_only=True</code> позволяет прочитать состояние без движения руки.</p>
       <div class="codeblock">
         <div class="code-head"><span>arm.py</span></div>
-        <pre><code><b class="kw">from</b> dobotkit <b class="kw">import</b> Dobot
+        <pre><code><b class="kw">from</b> dobot_usb <b class="kw">import</b> Dobot
 
 port = input(<span class="str">"Порт руки: "</span>).strip()
 <b class="kw">with</b> Dobot.connect(port, read_only=<b class="kw">True</b>) <b class="kw">as</b> arm:
@@ -94,7 +94,7 @@ port = input(<span class="str">"Порт руки: "</span>).strip()
     print(<span class="str">"Ошибки:"</span>, state.alarms)</code></pre>
       </div>
       <p>Программа выведет версию прошивки, три координаты в миллиметрах и ошибки, о которых сообщает контроллер. Пустой кортеж <code>()</code> означает, что активных ошибок он не сообщает.</p>
-      <p><a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/README.md#3-запомнить-позу-и-вернуться--4-минуты">Первое движение и возврат в сохранённую позу ↗</a></p>
+      <p><a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a3/README.md#3-запомнить-позу-и-вернуться--4-минуты">Первое движение и возврат в сохранённую позу ↗</a></p>
     </section>
     <section id="tools">
       <h2>Выбор насадки</h2>
@@ -110,6 +110,6 @@ port = input(<span class="str">"Порт руки: "</span>).strip()
     </section>
   </main>
 </div>
-<footer class="footer"><span>Dobot Kit</span><a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a2">Скачать v0.2.0a2 ↗</a></footer>
+<footer class="footer"><span>Dobot Kit</span><a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a3">Скачать v0.2.0a3 ↗</a></footer>
 </body>
 </html>

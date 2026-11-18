@@ -112,7 +112,7 @@ robot.motion.jog("x", 1, duration=0.2)
 `Bounds(minimum: Point, maximum: Point)` задаёт включительные границы XYZ/R.
 
 ```python
-from dobotkit import Bounds, Path, Point
+from dobot_usb import Bounds, Path, Point
 
 route = Path([Point(180, 0, 90, 0), Point(180, 10, 90, 0)])
 route = route.then(Point(190, 10, 90, 0))
@@ -146,7 +146,7 @@ ValueError. Достижимость и свободный ход инструм
 `lift_mm`.
 
 ```python
-from dobotkit import Dobot
+from dobot_usb import Dobot
 
 strokes = [[(0, 0), (5, 0)], [(0, 2), (5, 2)]]
 # До запуска выставь лёгкое касание закреплённого листа.

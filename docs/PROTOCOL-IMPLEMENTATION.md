@@ -1,7 +1,7 @@
 # Classic Magician parameter codecs
 
 Implemented offline on 2026-11-16 against **Communication Protocol V1.1.5**, 69
-subsections 1.3.1–1.19.7. `dobotkit.commands.COMMANDS` contains one `CommandSpec`
+subsections 1.3.1–1.19.7. `dobot_usb.commands.COMMANDS` contains one `CommandSpec`
 per subsection. **67 subsections have codecs; two explicitly refuse unresolved
 SET layouts.** No serial port, controller, instrument, flash, firmware or real
 queue was accessed. These are parameter codecs, not hardware acceptance.
