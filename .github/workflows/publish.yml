@@ -7,7 +7,7 @@ on:
         description: Existing GitHub release tag
         type: string
         required: true
-        default: v0.2.0a2
+        default: v0.2.0a3
 
 permissions: {}
 
@@ -31,8 +31,8 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$TAG" =~ ^v[0-9][a-zA-Z0-9.]*$ ]]
-          wheel="dobot_kit-${TAG#v}-py3-none-any.whl"
-          source="dobot_kit-${TAG#v}.tar.gz"
+          wheel="dobot_usb-${TAG#v}-py3-none-any.whl"
+          source="dobot_usb-${TAG#v}.tar.gz"
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,assets > release.json
           jq -e '.isDraft == false' release.json > /dev/null
           jq -er --arg wheel "$wheel" --arg source "$source" '
