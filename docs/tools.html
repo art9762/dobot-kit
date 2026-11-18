@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fa">
+  <meta name="description" content="Как пользоваться присоской, схватом, пером, лазером и 3D-головкой DOBOT Magician из Python. Примеры для Dobot Kit.">
+  <title>Инструменты · Dobot Kit</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>Dobot Kit</a>
+      <nav class="topnav" aria-label="Основная навигация">
+        <a href="index.html">Быстрый старт</a>
+        <a href="tools.html" aria-current="page">Инструменты</a>
+        <a href="https://github.com/art9762/dobot-kit">GitHub ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <nav aria-label="На странице">
+        <p class="nav-title">На странице</p>
+        <a href="#suction">Присоска</a>
+        <a href="#gripper">Пневмосхват</a>
+        <a href="#pen">Перо</a>
+        <a href="#laser">Лазер</a>
+        <a href="#printing">3D-печать</a>
+        <a href="#peripherals">Периферия</a>
+      </nav>
+    </aside>
+
+    <main id="main" class="article">
+      <div class="intro">
+        <p class="breadcrumb"><a href="index.html">Документация</a> / Инструменты</p>
+        <h1>Инструменты</h1>
+        <p class="lead">У классического Magician пять штатных насадок. Первые четыре работают через <code>Dobot.connect()</code>. Для печатающей головки есть отдельный клиент <code>Printer</code>.</p>
+      </div>
+
+      <p>После смены насадки проверь смещение её рабочей точки (TCP) и заново запомни нужные позы. Перед движением закрой другие программы управления, выбери скорость под задачу и выясни, какие команды остались в очереди. Если старое задание можно отбросить, вызови <code>arm.stop(clear=True)</code> перед первым движением. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/TOOLS.md#смена-инструмента">Настройка смещения</a> · <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/API.md#очередь-и-ошибки">Работа с очередью</a></p>
+
+      <section id="suction">
+        <h2>Присоска</h2>
+        <p>Пустой присоской покажи руке два места — где взять предмет и куда его положить. Подведи её к каждой точке кнопкой Unlock, отпусти кнопку и сохрани позу. Для переноса понадобится свободный путь выше самой высокой из трёх поз — стартовой, захвата и укладки.</p>
+        <div class="codeblock">
+          <div class="code-head"><span>Python</span></div>
+          <pre><code>from dobotkit import Dobot
+
+port = input("Порт руки: ").strip()
+with Dobot.connect(port) as arm:
+    input("Присоска в точке захвата? Нажми Enter. ")
+    pick = arm.pose()
+    input("Присоска в точке укладки? Нажми Enter. ")
+    place = arm.pose()
+    lift_mm = float(input("На сколько мм подняться над точками? "))
+    if input("Путь свободен. Запустить перенос? [да/нет] ") == "да":
+        arm.suction.pick_and_place(pick, place, lift_mm=lift_mm)</code></pre>
+        </div>
+        <p>Рука подходит сверху, включает вакуум у предмета, отпускает его в точке укладки и поднимается. После ошибки проверь, где находится предмет и удерживает ли его присоска. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/examples/pick_and_place.py">Скрипт переноса с обучением точек</a></p>
+      </section>
+
+      <section id="gripper">
+        <h2>Пневмосхват</h2>
+        <p>Запомни две позы теми же шагами, что и для присоски. Для захвата подведи раскрытые губки по сторонам предмета. В программе выше замени последнюю строку вызовом для схвата.</p>
+        <div class="codeblock">
+          <div class="code-head"><span>Python</span></div>
+          <pre><code>arm.gripper.pick_and_place(pick, place, lift_mm=lift_mm)</code></pre>
+        </div>
+        <p>Схват раскрывается перед подходом, сжимает предмет в точке захвата и раскрывается после укладки. Для ручного управления есть <code>open()</code> и <code>close()</code>. Вызов <code>release()</code> отключает управление губками. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/examples/gripper.py">Скрипт для известных координат</a></p>
+      </section>
+
+      <section id="pen">
+        <h2>Перо</h2>
+        <p>Закрепи лист и подведи кончик пера до лёгкого касания. Эта поза станет началом рисунка. Каждая пара чисел в штрихе — смещение по X и Y в миллиметрах от точки касания.</p>
+        <div class="codeblock">
+          <div class="code-head"><span>Python</span></div>
+          <pre><code>from dobotkit import Dobot
+
+strokes = [[(0, 0), (5, 0)], [(0, 2), (5, 2)]]
+with Dobot.connect(input("Порт руки: ").strip()) as arm:
+    paper = arm.pose()
+    report = arm.pen.draw(strokes, origin=paper, lift_mm=3, dry_run=True)
+    print(report.completed_points)</code></pre>
+        </div>
+        <p><code>dry_run=True</code> физически проводит перо над листом. Для рисунка верни кончик в точку касания перед повторным запуском и убери аргумент <code>dry_run=True</code>. Рука проведёт две линии длиной 5 мм, приподнимая перо между ними и после последней. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/MOTION.md#перо-на-плоском-листе">Маршрут, расчёт без движения и отчёт</a></p>
+      </section>
+
+      <section id="laser">
+        <h2>Лазер</h2>
+        <p>Сначала прочитай состояние выхода контроллера. Этот скрипт открывает порт только для чтения.</p>
+        <div class="codeblock">
+          <div class="code-head"><span>Python</span></div>
+          <pre><code>from dobotkit import Dobot
+
+with Dobot.connect(input("Порт руки: ").strip(), read_only=True) as arm:
+    state = arm.laser.state()
+    print("Управление включено:", state.enabled)
+    print("Выход активен:", state.active)</code></pre>
+        </div>
+        <p><code>arm.laser.arm()</code> даёт программе разрешение на включение в текущем сеансе. За выход отвечают <code>on()</code> и <code>off()</code>. Остановка движения и закрытие порта оставляют управление выходом отдельной задачей. При потере связи состояние излучателя проверяют на установке. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/TOOLS.md#линия-лазером">Порядок работы с лазерной головкой</a></p>
+      </section>
+
+      <section id="printing">
+        <h2 id="printer">3D-печать</h2>
+        <p>Печатающей головке нужна принтерная прошивка Magician. Настрой головку и ноль стола по руководству Dobot, затем открой её порт через <code>Printer</code>. Для первой проверки достаточно узнать температуру сопла.</p>
+        <div class="codeblock">
+          <div class="code-head"><span>Python</span></div>
+          <pre><code>from dobotkit.printing import Printer
+
+port = input("Порт принтера: ").strip()
+with Printer.connect(port) as printer:
+    print("Температура сопла, °C:", printer.temperature().current_c)</code></pre>
+        </div>
+        <p>Для печати нарежь модель с профилем Magician и проверь слои в слайсере. В том же блоке <code>with</code> вызови <code>printer.print_file("part.gcode")</code>. Метод проверит команды файла и начнёт передавать задание принтеру. Протокол обмена проверен программно. Физическая печать и совместимость прошивки конкретного экземпляра пока требуют проверки. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/PRINTING.md">Формат задания, поддерживаемые команды и работа с Cura</a></p>
+      </section>
+
+      <section id="peripherals">
+        <h2>Периферия</h2>
+        <p>Дополнительная оснастка доступна через то же соединение <code>arm</code> в стандартном режиме Magician. Выбери группу по установленному устройству.</p>
+        <ul>
+          <li><strong>Рельс.</strong> <code>arm.rail.position()</code> возвращает положение в миллиметрах. При движении указывают и позицию рельса, и полную целевую позу руки. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/API-REFERENCE.md#robotrail">Методы рельса</a></li>
+          <li><strong>Конвейер.</strong> После измерения числа шагов на миллиметр укажи его в <code>arm.conveyor.configure()</code>. Тогда <code>run()</code> принимает скорость ленты в мм/с. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/API-REFERENCE.md#robotconveyor">Калибровка и управление</a></li>
+          <li><strong>Датчики.</strong> <code>arm.sensors.color()</code> читает RGB, а <code>infrared(port=...)</code> — состояние ИК-датчика. Перед чтением укажи порт и версию подключённого модуля в его настройках. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/API-REFERENCE.md#robotsensors">Настройка датчиков</a></li>
+          <li><strong>Входы и выходы.</strong> Через <code>arm.io</code> выбирают режим пина, читают цифровой вход и АЦП, управляют цифровым выходом и ШИМ. <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/API-REFERENCE.md#robotio">Методы I/O</a></li>
+        </ul>
+        <p><a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/API-REFERENCE.md">Все сигнатуры Python</a> · <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a2/docs/HARDWARE.md">Что проверено на роботе</a></p>
+      </section>
+    </main>
+  </div>
+<footer class="footer"><a href="index.html">← Быстрый старт</a><a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a2">Скачать v0.2.0a2 ↗</a></footer>
+</body>
+</html>
