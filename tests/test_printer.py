@@ -2,6 +2,7 @@
 
 import threading
 from collections import deque
+from types import SimpleNamespace
 
 import pytest
 
@@ -200,11 +201,26 @@ def test_invalid_tail_fails_before_any_print_command(wire, tmp_path, bad):
         (OSError("unplugged"), "serial exchange failed"),
     ],
 )
-def test_unknown_outcome_never_replays_or_sends_next_line(wire, tmp_path, reply, message):
+def test_unknown_outcome_never_replays_or_sends_next_line(
+    wire, tmp_path, reply, message, monkeypatch
+):
+    now = 0.0
+    read_until = wire.read_until
+
+    def read_with_timeout(delimiter: bytes, size: int) -> bytes:
+        nonlocal now
+        data = read_until(delimiter, size)
+        if not data:
+            # An empty serial read returns after waiting for its configured timeout.
+            now += wire.timeout
+        return data
+
+    monkeypatch.setattr(wire, "read_until", read_with_timeout)
+    monkeypatch.setattr("dobot_usb.printer.time", SimpleNamespace(monotonic=lambda: now))
     source = tmp_path / "broken.gcode"
     source.write_bytes(b"G90\nG1 X1\nG1 X2\n")
     wire.replies.extend([(b"M400", b"ok\n"), (b"G90", b"ok\n"), (b"G1 X1", reply)])
-    with Printer.connect("selected", timeout=0.01) as printer:
+    with Printer.connect("selected", timeout=0.1) as printer:
         with pytest.raises(PrinterError, match=message) as err:
             printer.print_file(source)
         assert "line 2 after 1 acknowledged" in str(err.value)
