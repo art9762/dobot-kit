@@ -1,0 +1,50 @@
+name: Publish release to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing GitHub release tag
+        type: string
+        required: true
+        default: v0.2.0a2
+
+permissions: {}
+
+concurrency:
+  group: pypi-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download and verify the released wheel and source archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^v[0-9][a-zA-Z0-9.]*$ ]]
+          wheel="dobot_kit-${TAG#v}-py3-none-any.whl"
+          source="dobot_kit-${TAG#v}.tar.gz"
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,assets > release.json
+          jq -e '.isDraft == false' release.json > /dev/null
+          jq -er --arg wheel "$wheel" --arg source "$source" '
+            [.assets[] | select(.name == $wheel or .name == $source)]
+            | select(length == 2) | .[]
+            | (.digest | capture("^sha256:(?<sha>[a-f0-9]{64})$").sha) + "  " + .name
+          ' release.json > checksums
+          test "$(wc -l < checksums)" -eq 2
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir dist --pattern "$wheel" --pattern "$source"
+          (cd dist && sha256sum --strict --check ../checksums)
+
+      - name: Publish with PyPI Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
+        with:
+          skip-existing: true
