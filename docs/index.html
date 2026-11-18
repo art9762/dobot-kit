@@ -32,14 +32,14 @@
     </nav>
     <nav class="secondary-nav" aria-label="Справочник">
       <p class="nav-title">Справочник</p>
-      <a href="https://github.com/art9762/dobot-kit/blob/main/docs/API-REFERENCE.md">Методы Python ↗</a>
+      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a4/docs/API-REFERENCE.md">Методы Python ↗</a>
       <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a3/docs/HARDWARE.md">Испытания на руке ↗</a>
       <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a3/docs/SOURCES.md">Источники ↗</a>
     </nav>
   </aside>
   <main class="article" id="main">
     <div class="intro">
-      <p class="breadcrumb">Документация <span aria-hidden="true">/</span> v0.2.0a4</p>
+      <p class="breadcrumb">Документация <span aria-hidden="true">/</span> <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a4">v0.2.0a4</a></p>
       <h1>Первое подключение</h1>
       <p class="lead">Установи Dobot Kit, подключи классический DOBOT Magician по USB и прочитай координаты руки из Python.</p>
       <figure class="connection" aria-label="Схема соединения">
@@ -50,10 +50,10 @@
     </div>
     <section id="install">
       <h2>Установка</h2>
-      <p>Открой папку с исходниками версии 0.2.0a4 в окружении с Python 3.11 или новее. Команда установит библиотеку и <code>pyserial</code> для работы с портом.</p>
+      <p>В окружении Python 3.11 или новее установи или обнови <a href="https://pypi.org/project/dobot-usb/0.2.0a4/">dobot-usb с PyPI</a>. Команда также установит <code>pyserial</code> для работы с портом.</p>
       <div class="codeblock">
         <div class="code-head"><span>Терминал</span></div>
-        <pre><code>python -m pip install .</code></pre>
+        <pre><code>python -m pip install -U dobot-usb</code></pre>
       </div>
       <details>
         <summary>Как создать окружение Python</summary>
@@ -94,7 +94,7 @@ port = input(<span class="str">"Порт руки: "</span>).strip()
     print(<span class="str">"Ошибки:"</span>, state.alarms)</code></pre>
       </div>
       <p>Программа выведет версию прошивки, три координаты в миллиметрах и ошибки, о которых сообщает контроллер. Пустой кортеж <code>()</code> означает, что активных ошибок он не сообщает.</p>
-      <p><a href="https://github.com/art9762/dobot-kit/blob/main/README.md#3-запомнить-позу-и-вернуться--4-минуты">Первое движение и возврат в сохранённую позу ↗</a></p>
+      <p><a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a4/README.md#3-запомнить-позу-и-вернуться--4-минуты">Первое движение и возврат в сохранённую позу ↗</a></p>
     </section>
     <section id="tools">
       <h2>Выбор насадки</h2>
@@ -110,6 +110,6 @@ port = input(<span class="str">"Порт руки: "</span>).strip()
     </section>
   </main>
 </div>
-<footer class="footer"><span>Dobot Kit</span><a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a3">Предыдущий релиз v0.2.0a3 ↗</a></footer>
+<footer class="footer"><span>Dobot Kit</span><a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a4">Скачать v0.2.0a4 ↗</a></footer>
 </body>
 </html>
