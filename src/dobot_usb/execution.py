@@ -140,6 +140,7 @@ class CommandExecutor:
         # Under _io_lock. Track acknowledged lifecycle writes by this exclusive owner.
         # A standalone CLEAR removes queued commands but does not change run state.
         self._queue_started = False
+        self._queue_cleared = False
 
     @property
     def closed(self) -> bool:
@@ -231,6 +232,8 @@ class CommandExecutor:
                 )
             if write and not queued and command in (240, 241, 242):
                 self._queue_started = command == 240
+            if write and not queued and command == 245:
+                self._queue_cleared = True
             return data
         except BaseException as exc:
             if write:
@@ -489,6 +492,18 @@ class CommandExecutor:
                     if handle._state == ExecutionState.ACCEPTED:
                         handle._state = ExecutionState.COMPLETED
                         handle._wake.set()
+
+    def prepare_queue(self) -> None:
+        """Discard work left by an earlier connection before the first action."""
+        with self._locked(time.monotonic() + _CONTROL_TIMEOUT):
+            with self._state_lock:
+                epoch = self._action_epoch()
+                self._check_epoch(epoch)
+            if not self._queue_cleared:
+                self._exchange(242, write=True)
+                self._exchange(245, write=True)
+                self._last_index = None
+            self._check_epoch(epoch)
 
     def start(self, *, timeout: float = _CONTROL_TIMEOUT) -> None:
         """Send an explicit START even if this session previously started the queue."""

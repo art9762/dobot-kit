@@ -1,11 +1,8 @@
-"""Exceptions shared by the client, codecs, transports and executor."""
+"""Exceptions shared by the client, transport and executor."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
-
-if TYPE_CHECKING:
-    from .pen import PenReport
+from typing import Literal
 
 OutcomeStage = Literal["not_sent", "sent_unconfirmed", "accepted", "completed", "unknown"]
 
@@ -27,7 +24,6 @@ class DobotError(Exception):
         session_id: str | None = None,
     ) -> None:
         super().__init__(message)
-        self.pen_report: PenReport | None = None
         self.stage = stage
         self.command = command
         self.queue_index = queue_index

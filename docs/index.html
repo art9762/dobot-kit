@@ -3,113 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f8fa">
-  <meta name="description" content="Dobot Kit для Python 3.11+. Установка одной командой, подключение DOBOT Magician по USB, чтение координат и примеры для пяти насадок.">
-  <title>Первое подключение · Dobot Kit</title>
-  <link rel="stylesheet" href="assets/site.css">
-  <script src="assets/site.js" defer></script>
+  <title>Dobot Kit · Первое подключение</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { margin: 2rem auto; max-width: 42rem; padding: 0 1rem; font: 1rem/1.6 system-ui, sans-serif; }
+    h1, h2 { line-height: 1.25; }
+    pre { padding: 0.8rem 1rem; border: 1px solid GrayText; border-radius: 0.4rem; overflow: auto; }
+  </style>
 </head>
 <body>
-<a class="skip-link" href="#main">К содержанию</a>
-<header class="topbar">
-  <div class="topbar-inner">
-    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>Dobot Kit</a>
-    <nav class="topnav" aria-label="Основная навигация">
-      <a href="index.html" aria-current="page">Быстрый старт</a>
-      <a href="tools.html">Инструменты</a>
-      <a href="https://github.com/art9762/dobot-kit">GitHub ↗</a>
-    </nav>
-  </div>
-</header>
-<div class="layout">
-  <aside class="sidebar">
-    <nav aria-label="На странице">
-      <p class="nav-title">На странице</p>
-      <a href="#install">Установка</a>
-      <a href="#connect">Подключение по USB</a>
-      <a href="#position">Чтение координат</a>
-      <a href="#tools">Выбор насадки</a>
-    </nav>
-    <nav class="secondary-nav" aria-label="Справочник">
-      <p class="nav-title">Справочник</p>
-      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a4/docs/API-REFERENCE.md">Методы Python ↗</a>
-      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a3/docs/HARDWARE.md">Испытания на руке ↗</a>
-      <a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a3/docs/SOURCES.md">Источники ↗</a>
-    </nav>
-  </aside>
-  <main class="article" id="main">
-    <div class="intro">
-      <p class="breadcrumb">Документация <span aria-hidden="true">/</span> <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a4">v0.2.0a4</a></p>
-      <h1>Первое подключение</h1>
-      <p class="lead">Установи Dobot Kit, подключи классический DOBOT Magician по USB и прочитай координаты руки из Python.</p>
-      <figure class="connection" aria-label="Схема соединения">
-        <div class="endpoint"><strong>Python</strong><span>dobot_usb</span></div>
-        <div class="link-wire"><span>USB</span></div>
-        <div class="endpoint"><strong>Magician</strong><span>контроллер</span></div>
-      </figure>
-    </div>
-    <section id="install">
-      <h2>Установка</h2>
-      <p>В окружении Python 3.11 или новее установи или обнови <a href="https://pypi.org/project/dobot-usb/0.2.0a4/">dobot-usb с PyPI</a>. Команда также установит <code>pyserial</code> для работы с портом.</p>
-      <div class="codeblock">
-        <div class="code-head"><span>Терминал</span></div>
-        <pre><code>python -m pip install -U dobot-usb</code></pre>
-      </div>
-      <details>
-        <summary>Как создать окружение Python</summary>
-        <p>В папке проекта создай окружение и активируй его. Затем выполни команду установки выше.</p>
-        <div class="codeblock">
-          <div class="code-head"><span>macOS / Linux</span></div>
-          <pre><code>python3 -m venv .venv
-source .venv/bin/activate</code></pre>
-        </div>
-        <div class="codeblock">
-          <div class="code-head"><span>Windows PowerShell</span></div>
-          <pre><code>py -m venv .venv
-.&#92;.venv&#92;Scripts&#92;Activate.ps1</code></pre>
-        </div>
-      </details>
-    </section>
-    <section id="connect">
-      <h2>Подключение по USB</h2>
-      <p>Подключи руку в стандартном режиме Magician. Закрой DobotStudio или другую программу, которая использует её порт. Выведи список портов:</p>
-      <div class="codeblock">
-        <div class="code-head"><span>Терминал</span></div>
-        <pre><code>dobot ports</code></pre>
-      </div>
-      <p>Скопируй значение <code>device</code> нужного устройства. На Windows оно выглядит как <code>COM3</code>. Если рук несколько, при первом подключении определи порт каждой по очереди. Если список пуст, проверь USB-кабель и появление устройства в системе.</p>
-    </section>
-    <section id="position">
-      <h2>Чтение координат</h2>
-      <p>Сохрани код в <code>arm.py</code> и запусти <code>python arm.py</code>. Вставь имя своего порта, когда программа попросит. Режим <code>read_only=True</code> позволяет прочитать состояние без движения руки.</p>
-      <div class="codeblock">
-        <div class="code-head"><span>arm.py</span></div>
-        <pre><code><b class="kw">from</b> dobot_usb <b class="kw">import</b> connect
+<main>
+  <h1>Dobot Kit</h1>
+  <p>Управление классическим DOBOT Magician по USB из Python 3.11 и новее.</p>
 
-port = input(<span class="str">"Порт руки: "</span>).strip()
-<b class="kw">with</b> connect(port, read_only=<b class="kw">True</b>) <b class="kw">as</b> arm:
-    state = arm.status()
-    print(<span class="str">"Прошивка:"</span>, state.device.firmware)
-    print(<span class="str">"XYZ, мм:"</span>, state.pose.x, state.pose.y, state.pose.z)
-    print(<span class="str">"Ошибки:"</span>, state.alarms)</code></pre>
-      </div>
-      <p>Программа выведет версию прошивки, три координаты в миллиметрах и ошибки, о которых сообщает контроллер. Пустой кортеж <code>()</code> означает, что активных ошибок он не сообщает.</p>
-      <p><a href="https://github.com/art9762/dobot-kit/blob/v0.2.0a4/README.md#3-запомнить-позу-и-вернуться--4-минуты">Первое движение и возврат в сохранённую позу ↗</a></p>
-    </section>
-    <section id="tools">
-      <h2>Выбор насадки</h2>
-      <p>Открой пример для установленной головки. Для 3D-печати нужны принтерная прошивка, нарезанный G-code и отдельный клиент <code>Printer</code>.</p>
-      <ul class="tool-links">
-        <li><a href="tools.html#suction"><strong>Присоска</strong><span>Перенести предмет вакуумом</span></a></li>
-        <li><a href="tools.html#gripper"><strong>Пневмосхват</strong><span>Взять и отпустить предмет</span></a></li>
-        <li><a href="tools.html#pen"><strong>Перо</strong><span>Нарисовать линии на листе</span></a></li>
-        <li><a href="tools.html#laser"><strong>Лазер</strong><span>Управлять выходом головки</span></a></li>
-        <li><a href="tools.html#printing"><strong>3D-печать</strong><span>Отправить файл на печать</span></a></li>
-      </ul>
-      <p><a href="tools.html#peripherals">Рельс, конвейер, датчики и I/O →</a></p>
-    </section>
-  </main>
-</div>
-<footer class="footer"><span>Dobot Kit</span><a href="https://github.com/art9762/dobot-kit/releases/tag/v0.2.0a4">Скачать v0.2.0a4 ↗</a></footer>
+  <h2>Установка</h2>
+  <p>Включи Magician и подключи USB. В терминале открой папку с исходниками <code>dobot-kit</code> и выполни две команды в окружении Python. Вторая перечислит доступные порты.</p>
+  <pre><code>python -m pip install .
+python -m serial.tools.list_ports</code></pre>
+
+  <h2>Первый запуск</h2>
+  <p>Сохрани код в файл <code>robot_test.py</code> и замени <code>COM3</code> своим портом.</p>
+  <pre><code>from dobot_usb import Dobot
+
+robot = Dobot("COM3")
+print(robot.position())
+robot.close()</code></pre>
+  <p>Запусти программу в терминале. Она прочитает координаты и угол насадки.</p>
+  <pre><code>python robot_test.py</code></pre>
+
+  <p>Инструкция по движению и оснастке лежит в файле <code>README.md</code> в той же копии проекта.</p>
+</main>
 </body>
 </html>

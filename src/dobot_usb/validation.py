@@ -17,12 +17,3 @@ def number(value: object, name: str, *, minimum: float | None = None) -> float:
     if minimum is not None and result < minimum:
         raise ValueError(f"{name} must be at least {minimum}")
     return result
-
-
-def options(wait: bool, timeout: float) -> None:
-    if type(wait) is not bool:
-        raise ValueError("wait must be bool")
-    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)):
-        raise ValueError("timeout must be a finite positive number of seconds")
-    if not math.isfinite(timeout) or timeout <= 0:
-        raise ValueError("timeout must be a finite positive number of seconds")

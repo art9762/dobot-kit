@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dobot-usb"
-version = "0.2.0a4"
+version = "0.3.0a1"
 description = "A small Python interface for classic DOBOT Magician robots"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,9 +27,6 @@ Repository = "https://github.com/art9762/dobot-kit"
 Issues = "https://github.com/art9762/dobot-kit/issues"
 Releases = "https://github.com/art9762/dobot-kit/releases"
 
-[project.scripts]
-dobot = "dobot_usb.cli:main"
-
 [dependency-groups]
 dev = ["build>=1.2,<2", "pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2", "types-pyserial>=3.5,<4"]
 
@@ -37,12 +34,11 @@ dev = ["build>=1.2,<2", "pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2", "type
 packages = ["src/dobot_usb"]
 
 [tool.hatch.build.targets.sdist]
-include = ["/src", "/examples", "/docs", "/scripts/magician_smoke.py", "/README.md", "/LICENSE"]
+include = ["/src", "/docs", "/README.md", "/LICENSE"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
-markers = ["hardware: explicitly enabled tests requiring a physical robot"]
 
 [tool.ruff]
 target-version = "py311"
