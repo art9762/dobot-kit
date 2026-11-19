@@ -3,35 +3,100 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dobot Kit · Первое подключение</title>
-  <style>
-    :root { color-scheme: light dark; }
-    body { margin: 2rem auto; max-width: 42rem; padding: 0 1rem; font: 1rem/1.6 system-ui, sans-serif; }
-    h1, h2 { line-height: 1.25; }
-    pre { padding: 0.8rem 1rem; border: 1px solid GrayText; border-radius: 0.4rem; overflow: auto; }
-  </style>
+  <meta name="description" content="Документация Dobot Kit 0.3.0a1 для классического DOBOT Magician">
+  <title>Документация | Dobot Kit</title>
+  <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-<main>
-  <h1>Dobot Kit</h1>
-  <p>Управление классическим DOBOT Magician по USB из Python 3.11 и новее.</p>
+<a class="skip-link" href="#main">К содержанию</a>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="identity">
+      <a class="brand" href="index.html">Dobot Kit</a>
+      <a class="version" href="development.html#releases">0.3.0a1</a>
+    </div>
+    <nav class="header-links" aria-label="Исходники и пакет">
+      <a href="https://github.com/art9762/dobot-kit">GitHub</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a1/">PyPI</a>
+    </nav>
+  </div>
+</header>
+<div class="layout">
+  <nav class="site-nav" aria-label="Разделы документации">
+    <p class="nav-name">Документация</p>
+    <ul>
+      <li><a href="index.html" aria-current="page">Обзор</a></li>
+      <li><a href="api.html">Справочник API</a></li>
+      <li><a href="behavior.html">Поведение и диагностика</a></li>
+      <li><a href="protocol.html">USB-протокол</a></li>
+      <li><a href="guide.html">Начало работы</a></li>
+      <li><a href="development.html">Совместимость и разработка</a></li>
+    </ul>
+  </nav>
+  <main id="main" tabindex="-1">
+    <details class="small-nav">
+      <summary>Разделы документации</summary>
+      <nav aria-label="Разделы документации"><ul>
+      <li><a href="index.html" aria-current="page">Обзор</a></li>
+      <li><a href="api.html">Справочник API</a></li>
+      <li><a href="behavior.html">Поведение и диагностика</a></li>
+      <li><a href="protocol.html">USB-протокол</a></li>
+      <li><a href="guide.html">Начало работы</a></li>
+      <li><a href="development.html">Совместимость и разработка</a></li>
+      </ul></nav>
+    </details>
+    <details class="small-contents">
+      <summary>На этой странице</summary>
+      <nav aria-label="Содержание страницы"><ul>
+      <li class="h2"><a href="#install">Установка</a></li>
+      <li class="h2"><a href="#read-position">Чтение координат</a></li>
+      <li class="h2"><a href="#scope">Что поддерживает эта версия</a></li>
+      </ul></nav>
+    </details>
+<article class="doc-content">
+  <h1>Документация Dobot Kit</h1>
+  <p class="lead">Python-библиотека для управления классическим DOBOT Magician по USB. Версия 0.3.0a1, Python 3.11 и новее.</p>
 
-  <h2>Установка</h2>
-  <p>Включи Magician и подключи USB. В терминале открой папку с исходниками <code>dobot-kit</code> и выполни две команды в окружении Python. Вторая перечислит доступные порты.</p>
-  <pre><code>python -m pip install .
+  <div class="doc-grid" aria-label="Разделы документации">
+    <a class="doc-card" href="api.html"><strong>Справочник API</strong><span>Все вызовы, аргументы, единицы, результаты и возможные ошибки.</span></a>
+    <a class="doc-card" href="behavior.html"><strong>Поведение и диагностика</strong><span>Очередь, состояние после ошибки, восстановление связи и ограничения проверки.</span></a>
+    <a class="doc-card" href="protocol.html"><strong>USB-протокол</strong><span>Кадры и ответы, коды команд, таймауты, порядок обмена и проверка позиции.</span></a>
+    <a class="doc-card" href="guide.html"><strong>Начало работы</strong><span>Установка, выбор порта, первое чтение, перемещение и оснастка.</span></a>
+    <a class="doc-card" href="development.html"><strong>Совместимость и разработка</strong><span>Версии Python, история оборудования, миграция, тесты и выпуск пакета.</span></a>
+  </div>
+
+  <h2 id="install">Установка</h2>
+  <pre><code>python -m pip install dobot-usb==0.3.0a1
 python -m serial.tools.list_ports</code></pre>
+  <p>Первая команда устанавливает предварительный выпуск, вторая показывает имена портов. Подставь имя порта своего робота. Дополнительные шаги для Windows, macOS и Linux есть в <a href="guide.html">руководстве по подключению</a>.</p>
 
-  <h2>Первый запуск</h2>
-  <p>Сохрани код в файл <code>robot_test.py</code> и замени <code>COM3</code> своим портом.</p>
-  <pre><code>from dobot_usb import Dobot
+  <h2 id="read-position">Чтение координат</h2>
+  <pre data-language="python"><code>from dobot_usb import Dobot
 
 robot = Dobot("COM3")
 print(robot.position())
 robot.close()</code></pre>
-  <p>Запусти программу в терминале. Она прочитает координаты и угол насадки.</p>
-  <pre><code>python robot_test.py</code></pre>
+  <p><code>position()</code> возвращает четыре числа в порядке <code>x, y, z, angle</code>. Первые три выражены в миллиметрах, угол в градусах. Скрипт только читает данные контроллера.</p>
 
-  <p>Инструкция по движению и оснастке лежит в файле <code>README.md</code> в той же копии проекта.</p>
-</main>
+  <h2 id="scope">Что поддерживает эта версия</h2>
+  <p>Перемещение по прямой, поиск исходного положения, настройка процентов скорости и ускорения, управление присоской и пневматическим схватом, остановка и закрытие соединения.</p>
+  <p>Перед первым управляющим вызовом текущего подключения библиотека останавливает и очищает очередь, оставленную предыдущим сеансом. Подробности и последствия для уже принятой команды описаны в <a href="behavior.html#queue">разделе об очереди</a>.</p>
+  <aside class="callout"><p>0.3.0a1 меняет API предыдущей серии. Для существующих программ смотри <a href="development.html#migration">таблицу перехода</a>. Текущая версия прошла проверку с имитацией USB-обмена. Физическая проверка описана отдельно в <a href="development.html#verification">статусе совместимости</a>.</p></aside>
+</article>
+    <footer class="doc-footer">
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a1/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a1">Выпуск 0.3.0a1</a>
+    </footer>
+  </main>
+  <nav class="contents" aria-label="Содержание страницы">
+    <p class="nav-name">На этой странице</p>
+    <ul>
+      <li class="h2"><a href="#install">Установка</a></li>
+      <li class="h2"><a href="#read-position">Чтение координат</a></li>
+      <li class="h2"><a href="#scope">Что поддерживает эта версия</a></li>
+    </ul>
+  </nav>
+</div>
 </body>
 </html>

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Начало работы Dobot Kit 0.3.0a1 для классического DOBOT Magician">
+  <title>Начало работы | Dobot Kit</title>
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">К содержанию</a>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="identity">
+      <a class="brand" href="index.html">Dobot Kit</a>
+      <a class="version" href="development.html#releases">0.3.0a1</a>
+    </div>
+    <nav class="header-links" aria-label="Исходники и пакет">
+      <a href="https://github.com/art9762/dobot-kit">GitHub</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a1/">PyPI</a>
+    </nav>
+  </div>
+</header>
+<div class="layout">
+  <nav class="site-nav" aria-label="Разделы документации">
+    <p class="nav-name">Документация</p>
+    <ul>
+      <li><a href="index.html">Обзор</a></li>
+      <li><a href="api.html">Справочник API</a></li>
+      <li><a href="behavior.html">Поведение и диагностика</a></li>
+      <li><a href="protocol.html">USB-протокол</a></li>
+      <li><a href="guide.html" aria-current="page">Начало работы</a></li>
+      <li><a href="development.html">Совместимость и разработка</a></li>
+    </ul>
+  </nav>
+  <main id="main" tabindex="-1">
+    <details class="small-nav">
+      <summary>Разделы документации</summary>
+      <nav aria-label="Разделы документации"><ul>
+      <li><a href="index.html">Обзор</a></li>
+      <li><a href="api.html">Справочник API</a></li>
+      <li><a href="behavior.html">Поведение и диагностика</a></li>
+      <li><a href="protocol.html">USB-протокол</a></li>
+      <li><a href="guide.html" aria-current="page">Начало работы</a></li>
+      <li><a href="development.html">Совместимость и разработка</a></li>
+      </ul></nav>
+    </details>
+    <details class="small-contents">
+      <summary>На этой странице</summary>
+      <nav aria-label="Содержание страницы"><ul>
+      <li class="h2"><a href="#install">Установка</a></li>
+      <li class="h2"><a href="#port">Как выбрать USB-порт</a></li>
+      <li class="h2"><a href="#read">Первый запуск с чтением координат</a></li>
+      <li class="h2"><a href="#lift">Первое движение с подъёмом на 5 мм</a></li>
+      <li class="h2"><a href="#teach">Запись и повторение двух позиций</a></li>
+      <li class="h2"><a href="#tools">Присоска и пневматический схват</a></li>
+      <li class="h2"><a href="#next">Дальше</a></li>
+      </ul></nav>
+    </details>
+<article class="doc-content">
+  <h1>Практическое руководство</h1>
+  <p>От установки Dobot Kit 0.3.0a1 до чтения координат, первого движения, повторения записанных позиций и проверки оснастки. Каждый пример можно сохранить в отдельный файл и запустить командой из терминала.</p>
+
+  <h2 id="install">Установка</h2>
+  <p>Для работы нужны классический четырёхосевой DOBOT Magician, его питание и USB-кабель для передачи данных. Установи Python 3.11 или новее и открой терминал в папке, где будут лежать программы для робота. Если терминал показывает <code>&gt;&gt;&gt;</code>, введи <code>exit()</code>, чтобы вернуться из Python.</p>
+
+  <h3>Windows</h3>
+  <p>Открой командную строку <code>cmd</code>. Если используешь Windows Terminal, выбери профиль «Командная строка». Первая команда показывает версию Python.</p>
+  <pre><code>py -3 --version
+py -3 -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install dobot-usb==0.3.0a1</code></pre>
+
+  <h3>macOS и Linux</h3>
+  <pre><code>python3 --version
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install dobot-usb==0.3.0a1</code></pre>
+
+  <p><code>.venv</code> хранит Python-окружение для этого проекта. После открытия нового терминала снова выполни команду активации для своей системы. Если нужно выбрать конкретный установленный Python, укажи его при создании окружения, например <code>py -3.12 -m venv .venv</code> или <code>python3.12 -m venv .venv</code>.</p>
+  <p>Имя пакета для установки — <code>dobot-usb</code>. В файле Python используется <code>from dobot_usb import Dobot</code>. Проверь версию в том же окружении, из которого будешь запускать программы.</p>
+  <pre><code>python -m pip show dobot-usb</code></pre>
+
+  <h2 id="port">Как выбрать USB-порт</h2>
+  <ol>
+    <li>Включи питание Magician и подключи USB. Закрой DobotStudio и другие программы, которые могли занять порт.</li>
+    <li>Выполни следующую команду в терминале. Она выводит имена последовательных портов и их описания.</li>
+  </ol>
+  <pre><code>python -m serial.tools.list_ports -v</code></pre>
+  <p>Если портов несколько, сравни список до и после подключения кабеля, пока программы управления закрыты. В программе укажи точное имя появившегося порта.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">Система</th><th scope="col">Пример имени</th></tr></thead>
+      <tbody>
+        <tr><td>Windows</td><td><code>COM3</code></td></tr>
+        <tr><td>macOS</td><td><code>/dev/cu.usbserial-1420</code></td></tr>
+        <tr><td>Linux</td><td><code>/dev/ttyUSB0</code> или <code>/dev/ttyACM0</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Операционная система может выдать другое имя после подключения к новому USB-разъёму. При ошибке открытия сначала обнови список портов. Подробности об ошибках и правах доступа есть в разделе о <a href="behavior.html">подключении и диагностике</a>.</p>
+
+  <h2 id="read">Первый запуск с чтением координат</h2>
+  <p>Создай в рабочей папке текстовый файл <code>robot_test.py</code>, вставь код и замени <code>COM3</code> своим портом. Имя файла должно заканчиваться на <code>.py</code>.</p>
+  <pre data-language="python"><code>from dobot_usb import Dobot
+
+robot = Dobot("COM3")
+print(robot.position())
+robot.close()</code></pre>
+  <pre><code>python robot_test.py</code></pre>
+  <p>Можно увидеть, например, <code>(210.0, 0.0, 65.0, 0.0)</code>. Первые три числа — координаты <code>x</code>, <code>y</code> и <code>z</code> в миллиметрах. Последнее — угол насадки в градусах. Значения относятся к системе координат робота и его текущей конфигурации. Подключение и <code>position()</code> читают данные контроллера. <code>close()</code> освобождает порт.</p>
+  <p>В следующих примерах используется <code>with</code>. Python выполнит строки с отступом, затем закроет USB-соединение даже при исключении. Управление оснасткой и остановка выполняются отдельными командами.</p>
+
+  <h2 id="lift">Первое движение с подъёмом на 5 мм</h2>
+  <p>Освободи рабочую зону, проверь крепление насадки и выбери исходное положение с запасом по высоте. Весь отрезок на 5 мм вверх должен быть достижим и свободен от препятствий. Все примеры движения запускай, находясь рядом с роботом и имея доступ к штатной физической остановке.</p>
+  <p>Сохрани пример в <code>lift.py</code> и выполни <code>python lift.py</code> после подстановки своего порта.</p>
+  <pre data-language="python"><code>from dobot_usb import Dobot
+
+with Dobot("COM3") as robot:
+    robot.speed(10)
+    x, y, z, angle = robot.position()
+    robot.move(x, y, z + 5)
+    print(robot.position())</code></pre>
+  <p><code>speed(10)</code> задаёт 10% от настроенных в контроллере значений скорости и ускорения для перемещений от точки к точке. Координаты у <code>move()</code> абсолютные, поэтому для подъёма к текущей высоте прибавляется 5. Когда четвёртый аргумент опущен, сохраняется текущий угол. Следующая строка выполнится после подтверждения цели по показаниям контроллера.</p>
+  <aside class="callout">
+    <p>Первая команда управления в соединении останавливает и очищает оставшуюся очередь контроллера. Запускай пример после окончания предыдущих работ и при единоличном управлении роботом.</p>
+  </aside>
+
+  <h2 id="teach">Запись и повторение двух позиций</h2>
+  <p>Сохраняй точки с реального робота, чтобы повторить конкретную операцию на своём столе. Зафиксируй основание, оснастку и положение рабочей поверхности. При изменении любой из этих настроек запиши точки заново.</p>
+
+  <h3>Запись в файл</h3>
+  <p>Сохрани пример в <code>save_point.py</code> и укажи свой порт. В штатной программе контроллера осторожно подведи руку в первую позицию. Дождись остановки, отключи штатную программу от порта и запусти <code>python save_point.py</code>. Введи <code>a</code>, чтобы сохранить позицию в <code>point_a.json</code>. Проделай то же для точки <code>b</code>. Повторная запись под тем же именем заменяет сохранённые числа.</p>
+  <pre data-language="python"><code>import json
+from pathlib import Path
+
+from dobot_usb import Dobot
+
+port = "COM3"
+name = input("Имя точки (a или b) &gt; ").strip()
+if name not in {"a", "b"}:
+    raise ValueError("Введи a или b")
+
+with Dobot(port) as robot:
+    point = robot.position()
+
+path = Path(f"point_{name}.json")
+path.write_text(json.dumps(point), encoding="utf-8")
+print(path, point)</code></pre>
+
+  <h3>Повторение записанных точек</h3>
+  <p>Перед запуском убедись, что рабочая зона осталась прежней. Проверь, что прямые от текущей позиции до <code>a</code> и от <code>a</code> до <code>b</code> свободны. Если для переноса требуется обойти препятствие, запиши отдельные точки над ним и проверь каждый отрезок, включая подъём и спуск.</p>
+  <p>Сохрани программу в <code>replay.py</code>. Оба файла с точками должны лежать в рабочей папке терминала. В строке <code>robot.move(*point)</code> звёздочка передаёт четыре сохранённых числа как отдельные аргументы.</p>
+  <pre data-language="python"><code>import json
+import math
+from pathlib import Path
+
+from dobot_usb import Dobot
+
+
+def load_point(filename):
+    point = json.loads(Path(filename).read_text(encoding="utf-8"))
+    if type(point) is not list or len(point) != 4:
+        raise ValueError(f"В {filename} должно быть четыре числа")
+    if any(type(value) not in (int, float) or not math.isfinite(value) for value in point):
+        raise ValueError(f"Проверь числа в {filename}")
+    return point
+
+
+points = [load_point("point_a.json"), load_point("point_b.json")]
+
+with Dobot("COM3") as robot:
+    robot.speed(10)
+    for point in points:
+        robot.move(*point)
+        print(robot.position())</code></pre>
+  <p>Проверка файла отсеивает неподходящие данные. Достижимость точки, зазоры для насадки и свободу всех отрезков проверяет оператор. Движение выполняется последовательно, поэтому при ошибке выполнение цикла прервётся. Перед следующей попыткой проверь, где остановилась рука.</p>
+
+  <h2 id="tools">Присоска и пневматический схват</h2>
+  <p>Проверь установленную оснастку, подключение, крепёж и свободное пространство прежде, чем подавать команды. Начни с испытания без предмета над свободной поверхностью. Команды отрабатывают через очередь контроллера. Захват и удержание предмета проверяй визуально.</p>
+
+  <h3>Проверка присоски</h3>
+  <p>Сохрани код в <code>suction.py</code> и запусти <code>python suction.py</code>. Пока программа ждёт Enter, проверь состояние присоски, оставаясь вне рабочей зоны.</p>
+  <pre data-language="python"><code>from dobot_usb import Dobot
+
+with Dobot("COM3") as robot:
+    robot.suction_on()
+    input("Проверь присоску и нажми Enter для выключения ")
+    robot.suction_off()</code></pre>
+
+  <h3>Проверка схвата</h3>
+  <p>Сохрани код в <code>gripper.py</code> и запусти <code>python gripper.py</code>. Проверь движение губок без предмета, держа руки вдали от оснастки. <code>gripper_off()</code> отключает управляющий выход. Чтобы разжать губки, используй <code>gripper_open()</code>.</p>
+  <pre data-language="python"><code>from dobot_usb import Dobot
+
+with Dobot("COM3") as robot:
+    robot.gripper_open()
+    input("Проверь раскрытие и нажми Enter для закрытия ")
+    robot.gripper_close()
+    input("Проверь закрытие и нажми Enter для открытия ")
+    robot.gripper_open()
+    robot.gripper_off()</code></pre>
+
+  <h3>Как спланировать перенос предмета</h3>
+  <ol>
+    <li>Запиши четыре позиции на своём столе. Нужны точки захвата и укладки, а также точки подхода над каждой из них. Выбери высоту прохода с учётом насадки и предмета.</li>
+    <li>Пройди маршрут без предмета на малой скорости. Проверь прямые отрезки между позициями. Если нужны дополнительные точки обхода, запиши и проверь их заранее.</li>
+    <li>Подойди к предмету сверху, опустись в точку захвата и включи присоску либо закрой схват. Убедись, что предмет удерживается. Поднимись вертикально до точки подхода.</li>
+    <li>Перемести предмет в точку над местом укладки, опусти его на опору и только после этого отпусти. Подними насадку в свободное положение.</li>
+  </ol>
+  <p>При штатном завершении выключи присоску или открой и отключи схват после размещения предмета. При обрыве связи или прерывании программы оснастка может сохранить состояние. Сначала проверь руку и груз, затем выполни контролируемое восстановление. <a href="behavior.html">Остановка, ошибки и восстановление</a></p>
+
+  <h2 id="next">Дальше</h2>
+  <p>Используй <a href="api.html">справочник API</a> для точных сигнатур и поведения каждой команды. Для разработки и воспроизведения проверок открой <a href="development.html">руководство разработчика</a>.</p>
+</article>
+    <footer class="doc-footer">
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a1/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a1">Выпуск 0.3.0a1</a>
+    </footer>
+  </main>
+  <nav class="contents" aria-label="Содержание страницы">
+    <p class="nav-name">На этой странице</p>
+    <ul>
+      <li class="h2"><a href="#install">Установка</a></li>
+      <li class="h2"><a href="#port">Как выбрать USB-порт</a></li>
+      <li class="h2"><a href="#read">Первый запуск с чтением координат</a></li>
+      <li class="h2"><a href="#lift">Первое движение с подъёмом на 5 мм</a></li>
+      <li class="h2"><a href="#teach">Запись и повторение двух позиций</a></li>
+      <li class="h2"><a href="#tools">Присоска и пневматический схват</a></li>
+      <li class="h2"><a href="#next">Дальше</a></li>
+    </ul>
+  </nav>
+</div>
+</body>
+</html>
