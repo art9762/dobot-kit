@@ -34,7 +34,7 @@ dev = ["build>=1.2,<2", "pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2", "type
 packages = ["src/dobot_usb"]
 
 [tool.hatch.build.targets.sdist]
-include = ["/src", "/docs", "/README.md", "/CHANGELOG.md", "/LICENSE"]
+include = ["/src", "/docs", "/examples", "/README.md", "/CHANGELOG.md", "/LICENSE"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
