@@ -25,6 +25,7 @@ class MagicianDouble:
         self.pose_reply: bytes | None = None
         self.move_samples: deque[tuple[float, float, float, float]] = deque()
         self.drop_ack: int | None = None
+        self.color_reply = bytes((12, 34, 56))
 
     def open(self, **options: Any) -> FakeSerial:
         self.device = FakeSerial(**options)
@@ -66,6 +67,8 @@ class MagicianDouble:
                 self.index = self.tail
                 self.pose = self.destination
             data = struct.pack("<Q", self.index)
+        elif frame.command == 137:
+            data = self.color_reply
         else:
             raise AssertionError(f"Unexpected command: {frame}")
         return encode(Frame(frame.command, 0, data))
