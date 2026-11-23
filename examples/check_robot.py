@@ -39,19 +39,30 @@ def main() -> None:
             return
 
         axis = ("x", "y", "z", "angle").index(args.axis)
-        target = list(origin)
-        target[axis] += args.offset
-        print("Will move in a straight line to:", tuple(target), "then return to:", origin)
+        coordinates = list(origin)
+        coordinates[axis] += args.offset
+        target = (coordinates[0], coordinates[1], coordinates[2], coordinates[3])
+        print("Will move in a straight line to:", target, "then return to:", origin)
         print("Speed and acceleration will be set to 5% and LEFT at 5%.")
         print("Check the complete route, tool clearance, workspace and emergency stop.")
         if input("Type MOVE to execute; anything else cancels: ").strip() != "MOVE":
             print("Cancelled; no control commands sent.")
             return
+        if robot.position() != origin:
+            print("Cancelled: the starting pose changed. No control commands sent.")
+            return
         try:
             robot.speed(5)
-            getattr(robot, f"move_{args.axis}")(args.offset)
-            print("Target position reported:", robot.position())
-            getattr(robot, f"move_{args.axis}")(0)
+            if robot.position() != origin:
+                raise DobotError("Starting pose changed after setting speed; no move sent.")
+            robot.move(*target)
+            reported = robot.position()
+            print("Target position reported:", reported)
+            # Do not start the return from a pose outside the same tolerances
+            # used by Dobot.move() to confirm the outbound target.
+            if math.dist(reported[:3], target[:3]) > 0.3 or abs(reported[3] - target[3]) > 0.65:
+                raise DobotError("Pose changed after the outbound move; no return move sent.")
+            robot.move(*origin)
             print("Origin position reported:", robot.position())
         except BaseException:
             # Best-effort stop only; never retry a failed move or return automatically.

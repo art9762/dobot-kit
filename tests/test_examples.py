@@ -1,8 +1,11 @@
 import runpy
+import struct
 import sys
 
 import pytest
 
+from dobot_usb import Dobot
+from dobot_usb.errors import DobotError
 from tests.test_dobot import MagicianDouble
 
 
@@ -54,7 +57,57 @@ def test_motion_example_confirmation_moves_then_returns(
     monkeypatch.setattr("time.sleep", lambda _: None)
     run_example(monkeypatch, "motion", "--axis", "x", "--offset=2")
     assert [f.command for f in magician.writes] == [242, 245, 83, 240, 84, 84]
+    assert moves(magician) == [(202, 5, 50, 30), (200, 5, 50, 30)]
     assert magician.pose == (200, 5, 50, 30)
+
+
+def moves(magician: MagicianDouble) -> list[tuple[float, ...]]:
+    return [struct.unpack("<4f", f.params[1:]) for f in magician.writes if f.command == 84]
+
+
+def test_motion_example_rejects_pose_drift_during_confirmation(
+    magician: MagicianDouble, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def confirm(_: str) -> str:
+        magician.pose = (200, 10, 50, 30)
+        return "MOVE"
+
+    monkeypatch.setattr("builtins.input", confirm)
+    run_example(monkeypatch, "motion", "--axis", "x")
+    assert magician.writes == []
+
+
+def test_motion_example_rejects_pose_drift_after_speed(
+    magician: MagicianDouble, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    original = Dobot.speed
+
+    def drift(robot: Dobot, percent: float) -> None:
+        original(robot, percent)
+        magician.pose = (200, 10, 50, 30)
+
+    monkeypatch.setattr("builtins.input", lambda _: "MOVE")
+    monkeypatch.setattr(Dobot, "speed", drift)
+    with pytest.raises(DobotError, match="no move sent"):
+        run_example(monkeypatch, "motion", "--axis", "x")
+    assert moves(magician) == []
+
+
+def test_motion_example_rejects_pose_drift_before_return(
+    magician: MagicianDouble, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    original = Dobot.move
+
+    def drift(robot: Dobot, x: float, y: float, z: float, angle: float | None = None) -> None:
+        original(robot, x, y, z, angle)
+        magician.pose = (202, 10, 50, 30)
+
+    monkeypatch.setattr("builtins.input", lambda _: "MOVE")
+    monkeypatch.setattr("time.sleep", lambda _: None)
+    monkeypatch.setattr(Dobot, "move", drift)
+    with pytest.raises(DobotError, match="no return move sent"):
+        run_example(monkeypatch, "motion", "--axis", "x")
+    assert moves(magician) == [(202, 5, 50, 30)]
 
 
 def test_color_example_does_not_move_or_touch_queue(
