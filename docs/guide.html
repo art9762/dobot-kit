@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Начало работы Dobot Kit 0.3.0a1 для классического DOBOT Magician">
+  <meta name="description" content="Начало работы Dobot Kit 0.3.0a2 для классического DOBOT Magician">
   <title>Начало работы | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a1</a>
+      <a class="version" href="development.html#releases">0.3.0a2</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a1/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a2/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -59,7 +59,7 @@
     </details>
 <article class="doc-content">
   <h1>Практическое руководство</h1>
-  <p>От установки Dobot Kit 0.3.0a1 до чтения координат, первого движения, повторения записанных позиций и проверки оснастки. Каждый пример можно сохранить в отдельный файл и запустить командой из терминала.</p>
+  <p>От установки Dobot Kit 0.3.0a2 до чтения координат, первого движения, повторения записанных позиций и проверки оснастки. Каждый пример можно сохранить в отдельный файл и запустить командой из терминала.</p>
 
   <h2 id="install">Установка</h2>
   <p>Для работы нужны классический четырёхосевой DOBOT Magician, его питание и USB-кабель для передачи данных. Установи Python 3.11 или новее и открой терминал в папке, где будут лежать программы для робота. Если терминал показывает <code>&gt;&gt;&gt;</code>, введи <code>exit()</code>, чтобы вернуться из Python.</p>
@@ -69,13 +69,13 @@
   <pre><code>py -3 --version
 py -3 -m venv .venv
 .venv\Scripts\activate.bat
-python -m pip install dobot-usb==0.3.0a1</code></pre>
+python -m pip install dobot-usb==0.3.0a2</code></pre>
 
   <h3>macOS и Linux</h3>
   <pre><code>python3 --version
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install dobot-usb==0.3.0a1</code></pre>
+python -m pip install dobot-usb==0.3.0a2</code></pre>
 
   <p><code>.venv</code> хранит Python-окружение для этого проекта. После открытия нового терминала снова выполни команду активации для своей системы. Если нужно выбрать конкретный установленный Python, укажи его при создании окружения, например <code>py -3.12 -m venv .venv</code> или <code>python3.12 -m venv .venv</code>.</p>
   <p>Имя пакета для установки — <code>dobot-usb</code>. В файле Python используется <code>from dobot_usb import Dobot</code>. Проверь версию в том же окружении, из которого будешь запускать программы.</p>
@@ -213,9 +213,9 @@ with Dobot("COM3") as robot:
   <p>Используй <a href="api.html">справочник API</a> для точных сигнатур и поведения каждой команды. Для разработки и воспроизведения проверок открой <a href="development.html">руководство разработчика</a>.</p>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a1/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a2/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a1">Выпуск 0.3.0a1</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a2">Выпуск 0.3.0a2</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">
