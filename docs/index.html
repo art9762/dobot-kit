@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Документация Dobot Kit 0.3.0a1 для классического DOBOT Magician">
+  <meta name="description" content="Документация Dobot Kit 0.3.0a2 для классического DOBOT Magician">
   <title>Документация | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a1</a>
+      <a class="version" href="development.html#releases">0.3.0a2</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a1/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a2/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -55,7 +55,7 @@
     </details>
 <article class="doc-content">
   <h1>Документация Dobot Kit</h1>
-  <p class="lead">Python-библиотека для управления классическим DOBOT Magician по USB. Версия 0.3.0a1, Python 3.11 и новее.</p>
+  <p class="lead">Python-библиотека для управления классическим DOBOT Magician по USB. Версия 0.3.0a2, Python 3.11 и новее.</p>
 
   <div class="doc-grid" aria-label="Разделы документации">
     <a class="doc-card" href="api.html"><strong>Справочник API</strong><span>Все вызовы, аргументы, единицы, результаты и возможные ошибки.</span></a>
@@ -66,7 +66,7 @@
   </div>
 
   <h2 id="install">Установка</h2>
-  <pre><code>python -m pip install dobot-usb==0.3.0a1
+  <pre><code>python -m pip install dobot-usb==0.3.0a2
 python -m serial.tools.list_ports</code></pre>
   <p>Первая команда устанавливает предварительный выпуск, вторая показывает имена портов. Подставь имя порта своего робота. Дополнительные шаги для Windows, macOS и Linux есть в <a href="guide.html">руководстве по подключению</a>.</p>
 
@@ -81,12 +81,12 @@ robot.close()</code></pre>
   <h2 id="scope">Что поддерживает эта версия</h2>
   <p>Перемещение по прямой, поиск исходного положения, настройка процентов скорости и ускорения, управление присоской и пневматическим схватом, остановка и закрытие соединения.</p>
   <p>Перед первым управляющим вызовом текущего подключения библиотека останавливает и очищает очередь, оставленную предыдущим сеансом. Подробности и последствия для уже принятой команды описаны в <a href="behavior.html#queue">разделе об очереди</a>.</p>
-  <aside class="callout"><p>0.3.0a1 меняет API предыдущей серии. Для существующих программ смотри <a href="development.html#migration">таблицу перехода</a>. Текущая версия прошла проверку с имитацией USB-обмена. Физическая проверка описана отдельно в <a href="development.html#verification">статусе совместимости</a>.</p></aside>
+  <aside class="callout"><p>0.3.0a2 меняет API предыдущей серии. Для существующих программ смотри <a href="development.html#migration">таблицу перехода</a>. Текущая версия прошла проверку с имитацией USB-обмена. Физическая проверка описана отдельно в <a href="development.html#verification">статусе совместимости</a>.</p></aside>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a1/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a2/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a1">Выпуск 0.3.0a1</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a2">Выпуск 0.3.0a2</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">

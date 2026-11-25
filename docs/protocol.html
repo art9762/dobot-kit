@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="USB-протокол Dobot Kit 0.3.0a1 для классического DOBOT Magician">
+  <meta name="description" content="USB-протокол Dobot Kit 0.3.0a2 для классического DOBOT Magician">
   <title>USB-протокол | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a1</a>
+      <a class="version" href="development.html#releases">0.3.0a2</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a1/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a2/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -62,7 +62,7 @@
     </details>
 <article class="doc-content">
   <h1>USB-протокол и исполнение</h1>
-  <p class="lead">Как версия 0.3.0a1 переводит Python-вызовы в байты Magician и определяет результат. Коды команд и поведение внутренних классов приведены для диагностики и разработки.</p>
+  <p class="lead">Как версия 0.3.0a2 переводит Python-вызовы в байты Magician и определяет результат. Коды команд и поведение внутренних классов приведены для диагностики и разработки.</p>
 
   <h2 id="serial">Открытие порта</h2>
   <ul>
@@ -130,7 +130,7 @@
   <p>Исполнитель держит текущее поколение очереди и внутренние квитанции. После подходящего ответа записи создаётся квитанция <code>accepted</code>. Для записи в очередь её индекс сравнивается с телеметрией. При выполнении условия квитанция переходит в <code>completed</code>. Немедленные записи имеют только ACK без индекса. Их исполнение по индексу проверить невозможно.</p>
   <p>Внутреннее состояние <code>cancelled</code> отменяет ожидание конкретной квитанции. Состояние <code>invalidated</code> означает, что квитанция потеряла связь с текущей очередью после очистки или закрытия. Эти состояния проверяются тестами исполнителя. Публичные методы <code>Dobot</code> не возвращают квитанции и не предоставляют отдельной отмены ожидания. <code>stop()</code> обращается к самому контроллеру.</p>
   <p>Управляющие вызовы одного экземпляра <code>Dobot</code> используют отдельную блокировку высокоуровневого действия. Она охватывает подготовку, отправку и ожидание. <code>stop()</code> её обходит и меняет поколение в исполнителе. Чтения через <code>position()</code> используют общие блокировки отдельных обменов. Другие программы и объекты не должны параллельно менять ту же очередь.</p>
-  <p>В протоколе также существует обычная приостановка <code>241</code>. Она присутствует в тестируемом исполнителе. <code>Dobot.stop()</code> всегда использует принудительную остановку <code>242</code> и очистку <code>245</code>. Публичных методов возобновления, прямой записи по ID и выбора режима очереди в версии 0.3.0a1 нет.</p>
+  <p>В протоколе также существует обычная приостановка <code>241</code>. Она присутствует в тестируемом исполнителе. <code>Dobot.stop()</code> всегда использует принудительную остановку <code>242</code> и очистку <code>245</code>. Публичных методов возобновления, прямой записи по ID и выбора режима очереди в версии 0.3.0a2 нет.</p>
 
   <h2 id="deadlines">Бюджеты ожидания</h2>
   <div class="table-wrap"><table>
@@ -153,9 +153,9 @@
   <p><a href="https://download.dobot.cc/product-manual/dobot-magician/pdf/en/Dobot-Communication-Protocol-V1.1.5.pdf">Dobot Magician Communication Protocol V1.1.5</a> · <a href="https://github.com/Dobot-Arm/DobotLink/blob/80c6ad78010721648ad671cc47320604d303f1d9/Plugins/MagicDevicePlugin/Protocol2/DMagicianProtocol.cpp">Реализация производителя DobotLink</a></p>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a1/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a2/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a1">Выпуск 0.3.0a1</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a2">Выпуск 0.3.0a2</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">

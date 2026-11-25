@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Справочник API Dobot Kit 0.3.0a1 для классического DOBOT Magician">
+  <meta name="description" content="Справочник API Dobot Kit 0.3.0a2 для классического DOBOT Magician">
   <title>Справочник API | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a1</a>
+      <a class="version" href="development.html#releases">0.3.0a2</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a1/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a2/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -68,7 +68,7 @@
     </details>
 <article class="doc-content">
   <h1>Справочник API</h1>
-  <p>Интерфейс <code>dobot-usb 0.3.0a1</code> для классического DOBOT Magician по USB. Пакет экспортирует класс <code>Dobot</code>. Его методы работают синхронно. Команды управления возвращают <code>None</code> после подтверждения, описанного ниже для каждой команды.</p>
+  <p>Интерфейс <code>dobot-usb 0.3.0a2</code> для классического DOBOT Magician по USB. Пакет экспортирует класс <code>Dobot</code>. Его методы работают синхронно. Команды управления возвращают <code>None</code> после подтверждения, описанного ниже для каждой команды.</p>
 
   <pre data-language="python"><code>from dobot_usb import Dobot
 
@@ -95,9 +95,8 @@ with Dobot("COM3") as robot:
     </table>
   </div>
 
-  <h2 id="helpers">Локальные дополнения (ещё не выпущены)</h2>
-  <p>В установленном 0.3.0a1 этих методов нет. Для работы с текущей копией:
-    <code>python -m pip install -e .</code> из корня репозитория.</p>
+  <h2 id="helpers">Калибровка, перемещения, рисование и датчик цвета</h2>
+  <p>Эти методы доступны начиная с <code>0.3.0a2</code>.</p>
   <h3 id="calibrate"><code>calibrate(position=None)</code> и <code>origin</code></h3>
   <p>Возвращает и запоминает <code>(x, y, z, angle)</code>, не двигает руку и не меняет
     систему координат контроллера. Без аргумента читает позицию; три числа сохраняют текущий
@@ -252,7 +251,7 @@ robot.move(*saved_pose)            # Передать x, y, z и угол из �
   <p>При постановке в очередь контроллер возвращает индекс команды. Если очередь ещё не запущена, библиотека запускает её. Затем она читает активные ошибки перед каждой проверкой индекса выполнения. Для <code>move()</code> и <code>home()</code> есть дополнительная проверка ошибок до отправки самой команды. Для настроек скорости и оснастки такая предварительная проверка отсутствует.</p>
   <div class="table-wrap">
     <table>
-      <thead><tr><th scope="col">Этап</th><th scope="col">Бюджет времени в 0.3.0a1</th></tr></thead>
+      <thead><tr><th scope="col">Этап</th><th scope="col">Бюджет времени в 0.3.0a2</th></tr></thead>
       <tbody>
         <tr><td>Обмен отдельным запросом и ответом, в том числе подтверждение записи</td><td>1 секунда на уровне последовательного транспорта</td></tr>
         <tr><td>Доступ к каналу для <code>position()</code>, подготовки очереди и <code>stop()</code></td><td>30 секунд на этап, затем один или несколько обменов</td></tr>
@@ -300,9 +299,9 @@ except DobotError as error:
   <p>Пошаговые примеры собраны в <a href="guide.html">руководстве</a>. Форматы ответов и внутренний порядок исполнения описаны в <a href="protocol.html">справочнике протокола</a>, запуск тестов и совместимость в <a href="development.html">документации для разработчиков</a>.</p>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a1/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a2/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a1">Выпуск 0.3.0a1</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a2">Выпуск 0.3.0a2</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">
