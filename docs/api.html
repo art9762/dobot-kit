@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Справочник API Dobot Kit 0.3.0a2 для классического DOBOT Magician">
+  <meta name="description" content="Справочник API Dobot Kit 0.3.0a3 для классического DOBOT Magician">
   <title>Справочник API | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a2</a>
+      <a class="version" href="development.html#releases">0.3.0a3</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a2/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a3/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -70,7 +70,7 @@
     </details>
 <article class="doc-content">
   <h1>Справочник API</h1>
-  <p>Интерфейс <code>dobot-usb 0.3.0a2</code> для классического DOBOT Magician по USB. Пакет экспортирует класс <code>Dobot</code>. Его методы работают синхронно. Команды управления возвращают <code>None</code> после подтверждения, описанного ниже для каждой команды.</p>
+  <p>Интерфейс <code>dobot-usb 0.3.0a3</code> для классического DOBOT Magician по USB. Пакет экспортирует класс <code>Dobot</code>. Его методы работают синхронно. Команды управления возвращают <code>None</code> после подтверждения, описанного ниже для каждой команды.</p>
 
   <pre data-language="python"><code>from dobot_usb import Dobot
 
@@ -88,12 +88,12 @@ with Dobot("COM3") as robot:
         <tr><td><a href="#move"><code>move(x, y, z, angle=None)</code></a></td><td>Переместить насадку по прямой к абсолютным координатам.</td></tr>
         <tr><td><a href="#home"><code>home()</code></a></td><td>Запустить процедуру поиска исходного положения.</td></tr>
         <tr><td><a href="#speed"><code>speed(percent)</code></a></td><td>Задать общий процент скорости и ускорения для PTP.</td></tr>
-        <tr><td><a href="#suck"><code>suck(enabled)</code></a></td><td>Включить или отключить присоску. Доступно в исходниках после 0.3.0a2.</td></tr>
+        <tr><td><a href="#suck"><code>suck(enabled)</code></a></td><td>Включить или отключить присоску.</td></tr>
         <tr><td><a href="#suction_on"><code>suction_on()</code></a> / <a href="#suction_off"><code>suction_off()</code></a></td><td>Включить или выключить присоску.</td></tr>
         <tr><td><a href="#gripper_open"><code>gripper_open()</code></a> / <a href="#gripper_close"><code>gripper_close()</code></a></td><td>Открыть или закрыть пневматический схват.</td></tr>
         <tr><td><a href="#gripper_off"><code>gripper_off()</code></a></td><td>Отключить выход управления схватом.</td></tr>
         <tr><td><a href="#stop"><code>stop()</code></a></td><td>Принудительно остановить очередь и удалить ожидающие команды.</td></tr>
-        <tr><td><a href="#clear"><code>clear()</code></a></td><td>Сбросить аварийные флаги и проверить результат. Доступно в исходниках после 0.3.0a2.</td></tr>
+        <tr><td><a href="#clear"><code>clear()</code></a></td><td>Сбросить аварийные флаги и проверить результат.</td></tr>
         <tr><td><a href="#close"><code>close()</code></a></td><td>Освободить порт.</td></tr>
       </tbody>
     </table>
@@ -211,8 +211,8 @@ robot.move(*saved_pose)            # Передать x, y, z и угол из �
     <table>
       <thead><tr><th scope="col">Метод</th><th scope="col">Флаг разрешения выхода</th><th scope="col">Флаг действия</th></tr></thead>
       <tbody>
-        <tr><td><code>suction_on()</code></td><td>Да</td><td>Да</td></tr>
-        <tr><td><code>suction_off()</code></td><td>Нет</td><td>Нет</td></tr>
+        <tr><td><code>suck(True)</code> или <code>suction_on()</code></td><td>Да</td><td>Да</td></tr>
+        <tr><td><code>suck(False)</code> или <code>suction_off()</code></td><td>Нет</td><td>Нет</td></tr>
         <tr><td><code>gripper_open()</code></td><td>Да</td><td>Нет</td></tr>
         <tr><td><code>gripper_close()</code></td><td>Да</td><td>Да</td></tr>
         <tr><td><code>gripper_off()</code></td><td>Нет</td><td>Нет</td></tr>
@@ -223,7 +223,7 @@ robot.move(*saved_pose)            # Передать x, y, z и угол из �
 
   <h3 id="suck"><code>suck(enabled)</code></h3>
   <pre><code>suck(enabled: bool) -> None</code></pre>
-  <p>В исходниках после выпуска <code>0.3.0a2</code> вызов <code>robot.suck(True)</code> включает присоску, а <code>robot.suck(False)</code> отключает. Аргумент должен быть значением Python типа <code>bool</code>. Методы <code>suction_on()</code> и <code>suction_off()</code> сохранены для совместимости и вызывают <code>suck(True)</code> и <code>suck(False)</code> соответственно.</p>
+  <p>Вызов <code>robot.suck(True)</code> включает присоску, а <code>robot.suck(False)</code> отключает. Аргумент должен быть значением Python типа <code>bool</code>. Методы <code>suction_on()</code> и <code>suction_off()</code> сохранены для совместимости и вызывают <code>suck(True)</code> и <code>suck(False)</code> соответственно.</p>
 
   <h3 id="suction_on"><code>suction_on()</code></h3>
   <pre><code>suction_on() -> None</code></pre>
@@ -252,7 +252,7 @@ robot.move(*saved_pose)            # Передать x, y, z и угол из �
 
   <h2 id="clear"><code>clear()</code></h2>
   <pre><code>clear() -> None</code></pre>
-  <p>Метод доступен в исходниках после выпуска <code>0.3.0a2</code>. Если авария прервала движение, вызовите <a href="#stop"><code>stop()</code></a>. Устраните причину аварии и вызовите <code>clear()</code>. Если это первое управляющее действие в сеансе, библиотека сначала остановит и очистит прежнюю очередь.</p>
+  <p>Если авария прервала движение, вызовите <a href="#stop"><code>stop()</code></a>. Устраните причину аварии и вызовите <code>clear()</code>. Если это первое управляющее действие в сеансе, библиотека сначала остановит и очистит прежнюю очередь.</p>
   <p>Метод отправляет немедленную команду сброса и считывает аварийные флаги. Пустой набор флагов даёт <code>None</code>. При сохранившихся флагах метод выбрасывает <code>RobotAlarmError</code> с их номерами в поле <code>alarms</code>. Для движения требуется новая команда оператора.</p>
 
   <h2 id="close"><code>close()</code></h2>
@@ -264,7 +264,7 @@ robot.move(*saved_pose)            # Передать x, y, z и угол из �
   <p>При постановке в очередь контроллер возвращает индекс команды. Если очередь ещё не запущена, библиотека запускает её. Затем она читает активные ошибки перед каждой проверкой индекса выполнения. Для <code>move()</code> и <code>home()</code> есть дополнительная проверка ошибок до отправки самой команды. Для настроек скорости и оснастки такая предварительная проверка отсутствует.</p>
   <div class="table-wrap">
     <table>
-      <thead><tr><th scope="col">Этап</th><th scope="col">Бюджет времени в 0.3.0a2</th></tr></thead>
+      <thead><tr><th scope="col">Этап</th><th scope="col">Бюджет времени в 0.3.0a3</th></tr></thead>
       <tbody>
         <tr><td>Обмен отдельным запросом и ответом, в том числе подтверждение записи</td><td>1 секунда на уровне последовательного транспорта</td></tr>
         <tr><td>Доступ к каналу для <code>position()</code>, подготовки очереди и <code>stop()</code></td><td>30 секунд на этап, затем один или несколько обменов</td></tr>
@@ -285,7 +285,7 @@ robot.move(*saved_pose)            # Передать x, y, z и угол из �
         <tr><td><code>ConnectionError</code></td><td>Порт не открылся, связь прервалась или был использован закрытый сеанс.</td></tr>
         <tr><td><code>RequestTimeout</code></td><td>Один обмен с контроллером не завершился вовремя. Транспорт закрывает соединение.</td></tr>
         <tr><td><code>ProtocolError</code></td><td>Ответ не соответствует запросу, формат данных нарушен или индекс очереди не согласуется с предыдущими показаниями. Ошибка на уровне обмена закрывает соединение.</td></tr>
-        <tr><td><code>RobotAlarmError</code></td><td>До <code>move()</code> или <code>home()</code>, во время ожидания команды либо при сверке позиции обнаружены активные ошибки контроллера. Поле <code>alarms</code> содержит номера активных битов.</td></tr>
+        <tr><td><code>RobotAlarmError</code></td><td>До <code>move()</code> или <code>home()</code>, во время ожидания команды, при сверке позиции или после <code>clear()</code> обнаружены активные ошибки контроллера. Поле <code>alarms</code> содержит номера активных битов.</td></tr>
         <tr><td><code>ExecutionTimeout</code></td><td>Истёк срок ожидания операции, выполнения в очереди или подтверждения позиции.</td></tr>
         <tr><td><code>CommandInvalidated</code></td><td>Сеанс или очередь изменились, пока вызов ожидал результата. Такое возможно, если другой поток вызвал <code>stop()</code> или <code>close()</code>.</td></tr>
         <tr><td><code>DobotError</code></td><td>Предыдущее принятое действие завершилось ошибкой. Новая команда управления отклонена в текущем сеансе до явной остановки.</td></tr>
@@ -312,9 +312,9 @@ except DobotError as error:
   <p>Пошаговые примеры собраны в <a href="guide.html">руководстве</a>. Форматы ответов и внутренний порядок исполнения описаны в <a href="protocol.html">справочнике протокола</a>, запуск тестов и совместимость в <a href="development.html">документации для разработчиков</a>.</p>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a2/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a3/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a2">Выпуск 0.3.0a2</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a3">Выпуск 0.3.0a3</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">
