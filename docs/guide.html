@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Начало работы Dobot Kit 0.3.0a3 для классического DOBOT Magician">
+  <meta name="description" content="Начало работы Dobot Kit 0.3.0a4 для классического DOBOT Magician">
   <title>Начало работы | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a3</a>
+      <a class="version" href="development.html#releases">0.3.0a4</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a3/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a4/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -52,14 +52,18 @@
       <li class="h2"><a href="#port">Как выбрать USB-порт</a></li>
       <li class="h2"><a href="#read">Первый запуск с чтением координат</a></li>
       <li class="h2"><a href="#lift">Первое движение с подъёмом на 5 мм</a></li>
+      <li class="h2"><a href="#axes">Начало отсчёта и движение по оси</a></li>
+      <li class="h2"><a href="#drawing">Квадрат в воздухе</a></li>
       <li class="h2"><a href="#teach">Запись и повторение двух позиций</a></li>
       <li class="h2"><a href="#tools">Присоска и пневматический схват</a></li>
+      <li class="h2"><a href="#color">Получение RGB</a></li>
+      <li class="h2"><a href="#recovery">Сброс ошибки контроллера</a></li>
       <li class="h2"><a href="#next">Дальше</a></li>
       </ul></nav>
     </details>
 <article class="doc-content">
   <h1>Практическое руководство</h1>
-  <p>От установки Dobot Kit 0.3.0a3 до чтения координат, первого движения, повторения записанных позиций и проверки оснастки. Каждый пример можно сохранить в отдельный файл и запустить командой из терминала.</p>
+  <p>Начни с чтения координат своего Magician. Затем выбери пример для нужной операции. Сохрани каждый пример в отдельный файл Python и подставь имя своего порта вместо <code>COM3</code>.</p>
 
   <h2 id="install">Установка</h2>
   <p>Для работы нужны классический четырёхосевой DOBOT Magician, его питание и USB-кабель для передачи данных. Установи Python 3.11 или новее и открой терминал в папке, где будут лежать программы для робота. Если терминал показывает <code>&gt;&gt;&gt;</code>, введи <code>exit()</code>, чтобы вернуться из Python.</p>
@@ -69,13 +73,13 @@
   <pre><code>py -3 --version
 py -3 -m venv .venv
 .venv\Scripts\activate.bat
-python -m pip install dobot-usb==0.3.0a3</code></pre>
+python -m pip install dobot-usb==0.3.0a4</code></pre>
 
   <h3>macOS и Linux</h3>
   <pre><code>python3 --version
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install dobot-usb==0.3.0a3</code></pre>
+python -m pip install dobot-usb==0.3.0a4</code></pre>
 
   <p><code>.venv</code> хранит Python-окружение для этого проекта. После открытия нового терминала снова выполни команду активации для своей системы. Если нужно выбрать конкретный установленный Python, укажи его при создании окружения, например <code>py -3.12 -m venv .venv</code> или <code>python3.12 -m venv .venv</code>.</p>
   <p>Имя пакета для установки — <code>dobot-usb</code>. В файле Python используется <code>from dobot_usb import Dobot</code>. Проверь версию в том же окружении, из которого будешь запускать программы.</p>
@@ -104,12 +108,11 @@ python -m pip install dobot-usb==0.3.0a3</code></pre>
   <p>Создай в рабочей папке текстовый файл <code>robot_test.py</code>, вставь код и замени <code>COM3</code> своим портом. Имя файла должно заканчиваться на <code>.py</code>.</p>
   <pre data-language="python"><code>from dobot_usb import Dobot
 
-robot = Dobot("COM3")
-print(robot.position())
-robot.close()</code></pre>
+with Dobot("COM3") as robot:
+    print(robot.position())</code></pre>
   <pre><code>python robot_test.py</code></pre>
   <p>Можно увидеть, например, <code>(210.0, 0.0, 65.0, 0.0)</code>. Первые три числа — координаты <code>x</code>, <code>y</code> и <code>z</code> в миллиметрах. Последнее — угол насадки в градусах. Значения относятся к системе координат робота и его текущей конфигурации. Подключение и <code>position()</code> читают данные контроллера. <code>close()</code> освобождает порт.</p>
-  <p>В следующих примерах используется <code>with</code>. Python выполнит строки с отступом, затем закроет USB-соединение даже при исключении. Управление оснасткой и остановка выполняются отдельными командами.</p>
+  <p>Блок <code>with</code> закрывает USB-соединение и при штатном выходе, и при исключении. Управление оснасткой и остановка выполняются отдельными командами.</p>
 
   <h2 id="lift">Первое движение с подъёмом на 5 мм</h2>
   <p>Освободи рабочую зону, проверь крепление насадки и выбери исходное положение с запасом по высоте. Весь отрезок на 5 мм вверх должен быть достижим и свободен от препятствий. Все примеры движения запускай, находясь рядом с роботом и имея доступ к штатной физической остановке.</p>
@@ -118,13 +121,36 @@ robot.close()</code></pre>
 
 with Dobot("COM3") as robot:
     robot.speed(10)
-    x, y, z, angle = robot.position()
+    x, y, z, _ = robot.position()
     robot.move(x, y, z + 5)
     print(robot.position())</code></pre>
-  <p><code>speed(10)</code> задаёт 10% от настроенных в контроллере значений скорости и ускорения для перемещений от точки к точке. Координаты у <code>move()</code> абсолютные, поэтому для подъёма к текущей высоте прибавляется 5. Когда четвёртый аргумент опущен, сохраняется текущий угол. Следующая строка выполнится после подтверждения цели по показаниям контроллера.</p>
+  <p><code>speed(10)</code> задаёт 10% от настроенных в контроллере значений скорости и ускорения для перемещений от точки к точке. Координаты у <code>move()</code> абсолютные, поэтому для подъёма к текущей высоте прибавляется 5. Когда четвёртый аргумент опущен, сохраняется текущий угол. После подтверждения цели программа напечатает показания контроллера. Настройка скорости и ускорения сохранится после выхода из программы.</p>
   <aside class="callout">
-    <p>Первая команда управления в соединении останавливает и очищает оставшуюся очередь контроллера. Запускай пример после окончания предыдущих работ и при единоличном управлении роботом.</p>
+    <p>Перед первым действием с очередью библиотека останавливает её и удаляет прежние команды. В этом примере подготовку запускает <code>speed(10)</code>. Запускай пример после окончания предыдущих работ и при единоличном управлении роботом.</p>
   </aside>
+
+  <h2 id="axes">Начало отсчёта и движение по оси</h2>
+  <p><code>calibrate()</code> запоминает текущую позицию в объекте Python. После этого <code>move_z(3)</code> задаёт высоту на 3 мм выше сохранённой и сохраняет текущие X, Y и угол. При повторном вызове цель по Z будет той же. Для абсолютной высоты можно вызвать <code>set_z(z)</code> без калибровки.</p>
+  <p>Проверь свободный путь на 3 мм вверх и обратно. Пример возвращает Z на исходную высоту.</p>
+  <pre data-language="python"><code>from dobot_usb import Dobot
+
+with Dobot("COM3") as robot:
+    robot.speed(5)
+    origin = robot.calibrate()
+    robot.move_z(3)
+    print("После подъёма:", robot.position())
+    robot.set_z(origin[2])</code></pre>
+  <p>Для цели сразу по четырём координатам есть <code>move_relative(dx, dy, dz, dangle)</code>. Каждое смещение отсчитывается от <code>origin</code>, а пропущенная величина равна нулю. При новом подключении начало нужно задать снова.</p>
+
+  <h2 id="drawing">Квадрат в воздухе</h2>
+  <p>Выбери положение над поверхностью, в котором весь квадрат со стороной 4 мм свободен в направлениях +X и +Y. Пример начинает в текущей позиции, проходит четыре стороны в плоскости XY и возвращается в исходный угол.</p>
+  <pre data-language="python"><code>from dobot_usb import Dobot
+
+with Dobot("COM3") as robot:
+    start = robot.position()
+    robot.speed(5)
+    robot.draw_square(start, side=4, plane="xy")</code></pre>
+  <p>Для прямоугольника вызови <code>draw_rectangle(start, width, height)</code>. При передаче другой начальной точки рука сначала идёт к ней по прямой. Высоту над бумагой, опускание и подъём пера задаёт твоя программа. Пример настраивает скорость и ускорение на 5%.</p>
 
   <h2 id="teach">Запись и повторение двух позиций</h2>
   <p>Сохраняй точки с реального робота, чтобы повторить конкретную операцию на своём столе. Зафиксируй основание, оснастку и положение рабочей поверхности. При изменении любой из этих настроек запиши точки заново.</p>
@@ -185,8 +211,10 @@ with Dobot("COM3") as robot:
 
 with Dobot("COM3") as robot:
     robot.suck(True)
-    input("Проверь присоску и нажми Enter для выключения ")
-    robot.suck(False)</code></pre>
+    try:
+        input("Проверь присоску и нажми Enter для выключения ")
+    finally:
+        robot.suck(False)</code></pre>
   <p>Принимаются значения Python <code>True</code> и <code>False</code>. <a href="api.html#suck">Справочник по присоске</a>.</p>
 
   <h3>Проверка схвата</h3>
@@ -210,13 +238,48 @@ with Dobot("COM3") as robot:
   </ol>
   <p>При штатном завершении выключи присоску или открой и отключи схват после размещения предмета. При обрыве связи или прерывании программы оснастка может сохранить состояние. Сначала проверь руку и груз, затем выполни контролируемое восстановление. <a href="behavior.html">Остановка, ошибки и восстановление</a></p>
 
+  <h2 id="color">Получение RGB</h2>
+  <p>Выбери разъём и поколение установленного датчика. Этот пример рассчитан на штатный датчик V1 в GP2. Его обработчик получит три показания подряд, включая одинаковые, и завершит опрос.</p>
+  <pre data-language="python"><code>from dobot_usb import Dobot
+
+samples = []
+
+def collect(rgb):
+    samples.append(rgb)
+    print(rgb)
+    return len(samples) &lt; 3
+
+with Dobot("COM3") as robot:
+    robot.color_sensor(port="GP2", version=1)
+    try:
+        robot.watch_color(collect, interval=0.2, changes_only=False)
+    finally:
+        robot.color_sensor(False, port="GP2", version=1)</code></pre>
+  <p>Для одного показания после настройки достаточно <code>rgb = robot.read_color()</code>. Результат содержит три числа от 0 до 255. Проверь отклик на образцах при своём освещении, прежде чем использовать RGB для выбора действия.</p>
+
+  <h2 id="recovery">Сброс ошибки контроллера</h2>
+  <p>Если авария прервала движение, останови свой сценарий. Оставь один процесс владельцем USB-порта. Следующий пример оператор запускает отдельно для восстановления. Он останавливает очередь и запрашивает подтверждение перед сбросом.</p>
+  <pre data-language="python"><code>from dobot_usb import Dobot
+from dobot_usb.errors import RobotAlarmError
+
+with Dobot("COM3") as robot:
+    robot.stop()
+    if input("Устрани причину аварии. Введи CLEAR для сброса: ").strip() == "CLEAR":
+        try:
+            robot.clear()
+        except RobotAlarmError as error:
+            print("Активные коды:", error.alarms)
+            raise
+        print("Контроллер сообщил, что аварийные флаги сняты.")</code></pre>
+  <p>Если соединение оборвалось во время записи, результат команды может быть неизвестен. Проверь состояние руки и оснастки перед новой командой. <a href="behavior.html#recovery">Восстановление после сбоя</a>.</p>
+
   <h2 id="next">Дальше</h2>
   <p>Используй <a href="api.html">справочник API</a> для точных сигнатур и поведения каждой команды. Для разработки и воспроизведения проверок открой <a href="development.html">руководство разработчика</a>.</p>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a3/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a4/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a3">Выпуск 0.3.0a3</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a4">Выпуск 0.3.0a4</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">
@@ -226,8 +289,12 @@ with Dobot("COM3") as robot:
       <li class="h2"><a href="#port">Как выбрать USB-порт</a></li>
       <li class="h2"><a href="#read">Первый запуск с чтением координат</a></li>
       <li class="h2"><a href="#lift">Первое движение с подъёмом на 5 мм</a></li>
+      <li class="h2"><a href="#axes">Начало отсчёта и движение по оси</a></li>
+      <li class="h2"><a href="#drawing">Квадрат в воздухе</a></li>
       <li class="h2"><a href="#teach">Запись и повторение двух позиций</a></li>
       <li class="h2"><a href="#tools">Присоска и пневматический схват</a></li>
+      <li class="h2"><a href="#color">Получение RGB</a></li>
+      <li class="h2"><a href="#recovery">Сброс ошибки контроллера</a></li>
       <li class="h2"><a href="#next">Дальше</a></li>
     </ul>
   </nav>

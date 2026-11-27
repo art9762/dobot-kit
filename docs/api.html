@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Справочник API Dobot Kit 0.3.0a3 для классического DOBOT Magician">
+  <meta name="description" content="Справочник API Dobot Kit 0.3.0a4 для классического DOBOT Magician">
   <title>Справочник API | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a3</a>
+      <a class="version" href="development.html#releases">0.3.0a4</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a3/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a4/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -48,296 +48,211 @@
     <details class="small-contents">
       <summary>На этой странице</summary>
       <nav aria-label="Содержание страницы"><ul>
-      <li class="h2"><a href="#dobot">Dobot(port)</a></li>
-      <li class="h3"><a href="#with">Контекстный менеджер with</a></li>
-      <li class="h2"><a href="#position">position()</a></li>
-      <li class="h2"><a href="#move">move(x, y, z, angle=None)</a></li>
-      <li class="h2"><a href="#home">home()</a></li>
-      <li class="h2"><a href="#speed">speed(percent)</a></li>
-      <li class="h2"><a href="#tools">Присоска и пневматический схват</a></li>
-      <li class="h3"><a href="#suck">suck(enabled)</a></li>
-      <li class="h3"><a href="#suction_on">suction_on()</a></li>
-      <li class="h3"><a href="#suction_off">suction_off()</a></li>
-      <li class="h3"><a href="#gripper_open">gripper_open()</a></li>
-      <li class="h3"><a href="#gripper_close">gripper_close()</a></li>
-      <li class="h3"><a href="#gripper_off">gripper_off()</a></li>
-      <li class="h2"><a href="#stop">stop()</a></li>
-      <li class="h2"><a href="#clear">clear()</a></li>
-      <li class="h2"><a href="#close">close()</a></li>
-      <li class="h2"><a href="#queue">Очередь и время выполнения</a></li>
-      <li class="h2"><a href="#errors">Ошибки и диагностика</a></li>
+      <li class="h2"><a href="#index">Указатель вызовов</a></li>
+      <li class="h2"><a href="#dobot">Подключение и позиция</a></li>
+      <li class="h2"><a href="#helpers">Калибровка и origin</a></li>
+      <li class="h2"><a href="#move">Абсолютное перемещение</a></li>
+      <li class="h2"><a href="#set-axis">Одна координата</a></li>
+      <li class="h2"><a href="#relative">Смещения от начала</a></li>
+      <li class="h2"><a href="#drawing">Отрезок и фигуры</a></li>
+      <li class="h2"><a href="#speed">Скорость и homing</a></li>
+      <li class="h2"><a href="#tools">Присоска и схват</a></li>
+      <li class="h2"><a href="#color">Датчик цвета</a></li>
+      <li class="h2"><a href="#stop">Остановка и сброс</a></li>
+      <li class="h2"><a href="#queue">Очередь и подтверждение</a></li>
+      <li class="h2"><a href="#errors">Ошибки и восстановление</a></li>
       </ul></nav>
     </details>
 <article class="doc-content">
   <h1>Справочник API</h1>
-  <p>Интерфейс <code>dobot-usb 0.3.0a3</code> для классического DOBOT Magician по USB. Пакет экспортирует класс <code>Dobot</code>. Его методы работают синхронно. Команды управления возвращают <code>None</code> после подтверждения, описанного ниже для каждой команды.</p>
+  <p class="lead"><code>Dobot</code> управляет классическим четырёхосевым Magician по USB. Вызовы синхронные. XYZ и размеры задаются в миллиметрах, угол насадки — в градусах, время — в секундах.</p>
 
+  <h2 id="index">Указатель вызовов</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th scope="col">Задача</th><th scope="col">Методы и свойства</th></tr></thead>
+    <tbody>
+      <tr><td>Открыть порт, узнать положение, завершить сеанс</td><td><a href="#dobot"><code>Dobot(port)</code></a>, <a href="#with"><code>with</code></a>, <a href="#position"><code>position()</code></a>, <a href="#close"><code>close()</code></a></td></tr>
+      <tr><td>Запомнить начало отсчёта в программе</td><td><a href="#calibrate"><code>calibrate()</code></a>, <a href="#origin"><code>origin</code></a></td></tr>
+      <tr><td>Перейти в абсолютную точку</td><td><a href="#move"><code>move()</code></a>, <a href="#set_x"><code>set_x()</code></a>, <a href="#set_y"><code>set_y()</code></a>, <a href="#set_z"><code>set_z()</code></a>, <a href="#set_angle"><code>set_angle()</code></a></td></tr>
+      <tr><td>Отмерить смещение от калибровки</td><td><a href="#move_x"><code>move_x()</code></a>, <a href="#move_y"><code>move_y()</code></a>, <a href="#move_z"><code>move_z()</code></a>, <a href="#move_angle"><code>move_angle()</code></a>, <a href="#move_relative"><code>move_relative()</code></a></td></tr>
+      <tr><td>Пройти отрезок или фигуру</td><td><a href="#draw_line"><code>draw_line()</code></a>, <a href="#draw_rectangle"><code>draw_rectangle()</code></a>, <a href="#draw_square"><code>draw_square()</code></a>, <a href="#draw_triangle"><code>draw_triangle()</code></a>, <a href="#draw_circle"><code>draw_circle()</code></a></td></tr>
+      <tr><td>Задать скорость или выполнить homing</td><td><a href="#speed"><code>speed()</code></a>, <a href="#home"><code>home()</code></a></td></tr>
+      <tr><td>Управлять пневматикой</td><td><a href="#suck"><code>suck()</code></a>, <a href="#suction_on"><code>suction_on()</code></a>, <a href="#suction_off"><code>suction_off()</code></a>, <a href="#gripper_open"><code>gripper_open()</code></a>, <a href="#gripper_close"><code>gripper_close()</code></a>, <a href="#gripper_off"><code>gripper_off()</code></a></td></tr>
+      <tr><td>Настроить датчик и читать RGB</td><td><a href="#color_sensor"><code>color_sensor()</code></a>, <a href="#read_color"><code>read_color()</code></a>, <a href="#watch_color"><code>watch_color()</code></a></td></tr>
+      <tr><td>Остановить движение или сбросить аварию</td><td><a href="#stop"><code>stop()</code></a>, <a href="#clear"><code>clear()</code></a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="dobot">Подключение и чтение позиции</h2>
+  <pre id="__init__"><code>Dobot(port: str)</code></pre>
+  <p>Передайте точное непустое имя порта, например <code>COM3</code> в Windows или <code>/dev/ttyUSB0</code> в Linux. Конструктор открывает порт и проверяет связь чтением позиции. Если проверка завершается ошибкой, он освобождает порт. Имена доступных портов выводит <code>python -m serial.tools.list_ports</code>.</p>
+  <h3 id="with">Сеанс <code>with</code></h3>
   <pre data-language="python"><code>from dobot_usb import Dobot
 
 with Dobot("COM3") as robot:
     x, y, z, angle = robot.position()
-    print(f"X={x:.1f} мм  Y={y:.1f} мм  Z={z:.1f} мм  угол={angle:.1f}°")</code></pre>
+    print(x, y, z, angle)</code></pre>
+  <p>При входе <code id="__enter__">__enter__()</code> возвращает тот же объект. При выходе <code id="__exit__">__exit__()</code> вызывает <code>close()</code>. Исключение из блока передаётся вызывающему коду. В следующих фрагментах <code>robot</code> обозначает уже открытый экземпляр.</p>
+  <h3 id="position"><code>position() -&gt; tuple[float, float, float, float]</code></h3>
+  <p>Читает одну текущую выборку <code>(x, y, z, angle)</code>. Метод доступен и после <code>stop()</code>, пока порт открыт. Неверная длина ответа или значения NaN и бесконечности дают <code>ProtocolError</code>. Во время движения значения могут меняться между двумя чтениями.</p>
+  <h3 id="close"><code>close() -&gt; None</code></h3>
+  <p>Освобождает порт, повторный вызов допустим. Закрытие оставляет контроллер исполнять уже принятые команды. Чтобы остановить их или отключить оснастку, вызовите соответствующие методы при открытом порте.</p>
 
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th scope="col">Вызов</th><th scope="col">Назначение</th></tr></thead>
-      <tbody>
-        <tr><td><a href="#dobot"><code>Dobot(port)</code></a></td><td>Открыть соединение и получить пробный ответ с координатами.</td></tr>
-        <tr><td><a href="#with"><code>with Dobot(port) as robot</code></a></td><td>Использовать соединение внутри блока и закрыть при выходе.</td></tr>
-        <tr><td><a href="#position"><code>position()</code></a></td><td>Прочитать <code>(x, y, z, angle)</code>.</td></tr>
-        <tr><td><a href="#move"><code>move(x, y, z, angle=None)</code></a></td><td>Переместить насадку по прямой к абсолютным координатам.</td></tr>
-        <tr><td><a href="#home"><code>home()</code></a></td><td>Запустить процедуру поиска исходного положения.</td></tr>
-        <tr><td><a href="#speed"><code>speed(percent)</code></a></td><td>Задать общий процент скорости и ускорения для PTP.</td></tr>
-        <tr><td><a href="#suck"><code>suck(enabled)</code></a></td><td>Включить или отключить присоску.</td></tr>
-        <tr><td><a href="#suction_on"><code>suction_on()</code></a> / <a href="#suction_off"><code>suction_off()</code></a></td><td>Включить или выключить присоску.</td></tr>
-        <tr><td><a href="#gripper_open"><code>gripper_open()</code></a> / <a href="#gripper_close"><code>gripper_close()</code></a></td><td>Открыть или закрыть пневматический схват.</td></tr>
-        <tr><td><a href="#gripper_off"><code>gripper_off()</code></a></td><td>Отключить выход управления схватом.</td></tr>
-        <tr><td><a href="#stop"><code>stop()</code></a></td><td>Принудительно остановить очередь и удалить ожидающие команды.</td></tr>
-        <tr><td><a href="#clear"><code>clear()</code></a></td><td>Сбросить аварийные флаги и проверить результат.</td></tr>
-        <tr><td><a href="#close"><code>close()</code></a></td><td>Освободить порт.</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <h2 id="helpers">Калибровка и координаты</h2>
+  <h3 id="calibrate"><code>calibrate(position: Sequence[float] | None = None) -&gt; tuple[float, float, float, float]</code></h3>
+  <p>Возвращает и запоминает начало отсчёта для относительных перемещений. Без аргумента читает все четыре координаты. Для тройки <code>(x, y, z)</code> берёт угол из текущей позиции. Для четвёрки <code>(x, y, z, angle)</code> сохраняет заданные числа без чтения USB. Калибровка изменяет только сохранённую позу в этом объекте. Для воспроизводимого начала считывайте позу после остановки. После смены инструмента или homing при необходимости сохраните новое начало.</p>
+  <h3 id="origin"><code>origin -&gt; tuple[float, float, float, float] | None</code></h3>
+  <p>Свойство только для чтения. Возвращает сохранённый кортеж без обращения к USB. Новый экземпляр начинает со значения <code>None</code>.</p>
+  <pre data-language="python"><code>saved = robot.calibrate()
+print(robot.origin == saved)  # True</code></pre>
 
-  <h2 id="helpers">Калибровка, перемещения, рисование и датчик цвета</h2>
-  <p>Эти методы доступны начиная с <code>0.3.0a2</code>.</p>
-  <h3 id="calibrate"><code>calibrate(position=None)</code> и <code>origin</code></h3>
-  <p>Возвращает и запоминает <code>(x, y, z, angle)</code>, не двигает руку и не меняет
-    систему координат контроллера. Без аргумента читает позицию; три числа сохраняют текущий
-    угол, четыре задают его явно. <code>origin</code> возвращает сохранённый кортеж или
-    <code>None</code> до калибровки без USB. Данные хранятся только в объекте.
-    После homing или смены инструмента откалибруйте начало заново.</p>
-  <h3 id="set-axis">Абсолютное перемещение по одной оси</h3>
-  <pre><code>set_x(x) -> None
-set_y(y) -> None
-set_z(z) -> None
-set_angle(angle) -> None</code></pre>
-  <p>Физически перемещают одну ось в абсолютную координату контроллера:
-    X/Y/Z в мм, угол в градусах. Остальные координаты читаются из текущей позиции
-    непосредственно перед движением и сохраняются. Калибровка не нужна,
-    <code>origin</code> не меняется. Это не изменение нуля или системы координат.
-    Сроки ожидания, сверка позиции, проверка сигнализации и ошибки — как у
-    <code>move()</code>. Некорректное число отклоняется до обмена с контроллером.</p>
-  <h3 id="relative">Относительные движения</h3>
-  <p><code>move_x(offset)</code>, <code>move_y(offset)</code>, <code>move_z(offset)</code>,
-    <code>move_angle(offset)</code> задают одну ось как начало + офсет, остальные берут из
-    текущей позиции. <code>move_relative(dx=0, dy=0, dz=0, dangle=0)</code> задаёт все
-    четыре оси от начала. Повторы не накапливаются. До <code>calibrate()</code> —
-    <code>ValueError</code> без записи USB. Единицы: мм и градусы.</p>
-  <h3 id="drawing">Геометрические примитивы</h3>
-  <pre><code>draw_line(start, end)
-draw_rectangle(start, width, height, *, plane="xy")
-draw_square(start, side, *, plane="xy")
-draw_triangle(start, side, *, plane="xy")
-draw_circle(start, radius, *, segments=72, plane="xy")</code></pre>
-  <p>Возвращают <code>None</code>. Абсолютные точки содержат три или четыре числа.
-    Три числа сохраняют угол, прочитанный в начале маршрута. Размеры положительные, в мм.
-    Плоскость: <code>xy</code>, <code>xz</code>, <code>yz</code>. Прямоугольник и квадрат
-    начинаются от угла в положительные стороны осей, треугольник равносторонний.
-    У окружности <code>start</code> находится на окружности, центр — на радиус позади
-    первой оси плоскости, обход — в сторону положительной второй оси.
-    <code>segments</code> — целое 12–720. Фигуры кроме отрезка замкнуты.</p>
-  <p><strong>Подход к start тоже выполняется по прямой, без подъёма пера.</strong>
-    Автоматического включения инструмента и проверки столкновений нет.
-    Путь целиком проверяется на числовую корректность до движения, но не на достижимость.
-    Каждый отрезок выполняется как <code>move()</code>: до 30 секунд на исполнение и
-    до 5 секунд на сверку позиции. Это ломаная, не гладкая непрерывная интерполяция.
-    <code>stop()</code> и ошибки прерывают весь путь; повторной отправки нет.</p>
+  <h2 id="move">Абсолютное перемещение</h2>
+  <pre><code>move(x: float, y: float, z: float, angle: float | None = None) -&gt; None</code></pre>
+  <p>Перемещает насадку по прямой к координатам контроллера. Если угол пропущен или равен <code>None</code>, метод читает текущий угол, затем проверяет аварийные флаги и отправляет цель. Положение руки, достижимость цели и свободный ход насадки вдоль всего отрезка проверьте до запуска.</p>
+  <pre data-language="python"><code>x, y, z, angle = robot.position()
+robot.move(x, y, z + 2)  # Подъём на 2 мм с текущим углом</code></pre>
+  <p>Для координат, углов и размеров допустимы конечные значения <code>int</code> и <code>float</code>, представимые в <code>float32</code>. Значения <code>bool</code>, строки и выход за числовой диапазон приводят к <code>ValueError</code>. Физическую точность оценивают внешним измерением. <a href="#queue">Как библиотека проверяет достижение цели</a>.</p>
 
-  <h3 id="color">Датчик цвета</h3>
-  <pre><code>color_sensor(enabled=True, *, port, version) -> None
-read_color() -> tuple[int, int, int]
-watch_color(handler, *, interval=0.1, stop_event=None, changes_only=True) -> None</code></pre>
-  <p><code>port</code> — GP1/GP2/GP4/GP5; <code>version</code> — поколение датчика 1/2,
-    оба обязательны. Для V1-датчика на V2-роботе требуется GP2. Настройка немедленная,
-    возвращается по ACK и не меняет очередь движения. Факт работы датчика этим не доказан.
-    <code>read_color()</code> читает ровно три байта R/G/B (0–255), не включает датчик,
-    не интерпретирует нули, не классифицирует цвет, не доказывает свежесть измерения.
-    При другой длине ответа — <code>ProtocolError</code>. Подключение выбирается оператором,
-    автоматического определения поколения, повторов или fallback нет.</p>
-  <p><code>watch_color()</code> вызывает <code>handler((r, g, b))</code> синхронно на первом
-    показании и затем при точном изменении RGB. <code>changes_only=False</code> передаёт каждое
-    показание. <code>interval</code> — пауза 0.01–60 секунд после чтения и обработки.
-    Верните именно <code>False</code> из обработчика или установите переданный
-    <code>threading.Event</code>, чтобы выйти. Ctrl+C и исключения USB/обработчика передаются
-    вызывающему коду. Фонового потока и подавления шума нет. <code>stop()</code> не прерывает
-    опрос, <code>close()</code> не отключает датчик. Обработчик сам отвечает за свои действия.
-    <a href="color-sensor-research.md">Проверенный протокол и первичные источники</a>.</p>
+  <h3 id="set-axis">Изменить одну абсолютную координату</h3>
+  <dl>
+    <dt id="set_x"><code>set_x(x: float) -&gt; None</code></dt><dd>Задаёт абсолютную X в миллиметрах.</dd>
+    <dt id="set_y"><code>set_y(y: float) -&gt; None</code></dt><dd>Задаёт абсолютную Y в миллиметрах.</dd>
+    <dt id="set_z"><code>set_z(z: float) -&gt; None</code></dt><dd>Задаёт абсолютную Z в миллиметрах.</dd>
+    <dt id="set_angle"><code>set_angle(angle: float) -&gt; None</code></dt><dd>Задаёт абсолютный угол насадки в градусах.</dd>
+  </dl>
+  <p>Каждый метод сначала считывает текущую позу, заменяет выбранное значение и выполняет линейное перемещение. Остальные три координаты цели берутся из этого чтения. Методы доступны до калибровки. Например, <code>robot.set_z(50)</code> задаёт высоту 50 мм в системе контроллера.</p>
 
-  <h2 id="dobot"><code>Dobot(port)</code></h2>
-  <pre><code>Dobot(port: str)</code></pre>
-  <p><code>port</code> — непустая строка с точным именем последовательного порта. Строка из пробелов считается пустой. Передавайте имя без лишних пробелов, оно передаётся системе как есть. Примеры имён для разных систем ‒ <code>COM3</code>, <code>/dev/cu.usbserial-1420</code> и <code>/dev/ttyUSB0</code>. Способ узнать свой порт описан в <a href="guide.html">руководстве по установке</a>.</p>
-  <p>Конструктор открывает указанный порт со скоростью 115200 бод, 8 битами данных, без бита чётности и с одним стоп-битом. Затем выполняет пробное чтение позиции. При успешном ответе возвращается экземпляр <code>Dobot</code>. Это подтверждает обмен координатами в ожидаемом формате. Выбор модели и порта остаётся за оператором. Открытие порта не вызывает движение, поиск исходного положения, очистку очереди или включение оснастки.</p>
-  <p><code>ValueError</code> означает, что имя порта пустое или передано значение другого типа. При невозможности открыть порт, отсутствии полного ответа или неверном формате возможны <a href="#errors">ошибки соединения и протокола</a>. Если пробное чтение завершилось ошибкой, конструктор освобождает порт.</p>
+  <h3 id="relative">Смещения от сохранённого начала</h3>
+  <dl>
+    <dt id="move_x"><code>move_x(offset: float) -&gt; None</code></dt><dd>Задаёт X равной <code>origin[0] + offset</code> в миллиметрах.</dd>
+    <dt id="move_y"><code>move_y(offset: float) -&gt; None</code></dt><dd>Задаёт Y равной <code>origin[1] + offset</code> в миллиметрах.</dd>
+    <dt id="move_z"><code>move_z(offset: float) -&gt; None</code></dt><dd>Задаёт Z равной <code>origin[2] + offset</code> в миллиметрах.</dd>
+    <dt id="move_angle"><code>move_angle(offset: float) -&gt; None</code></dt><dd>Задаёт угол равным <code>origin[3] + offset</code> в градусах.</dd>
+    <dt id="move_relative"><code>move_relative(dx: float = 0, dy: float = 0, dz: float = 0, dangle: float = 0) -&gt; None</code></dt><dd>По всем четырём осям прибавляет аргументы к сохранённой позе. Пропущенное смещение равно нулю, поэтому по этой оси целью будет сохранённая координата.</dd>
+  </dl>
+  <p>Все пять методов требуют успешной калибровки. Иначе возникает <code>ValueError</code> до записи в порт. Четыре одноосевых метода сохраняют три остальные координаты текущей позы. Повтор одного и того же смещения задаёт то же значение выбранной координаты.</p>
+  <pre data-language="python"><code>robot.calibrate()
+robot.move_z(2)           # На 2 мм выше сохранённой Z
+robot.move_relative()     # Вернуть все четыре координаты к калибровке</code></pre>
 
-  <h3 id="with">Контекстный менеджер <code>with</code></h3>
-  <p>В примере выше переменная <code>robot</code> указывает на экземпляр, созданный конструктором. При выходе из блока <code>with</code> вызывается <a href="#close"><code>close()</code></a>, в том числе если внутри блока возникло исключение. Исключение передаётся вызывающему коду. Для остановки движения используйте отдельный вызов <a href="#stop"><code>stop()</code></a> при доступной связи.</p>
+  <h2 id="drawing">Отрезок и фигуры</h2>
+  <p>Точки задаются абсолютными координатами в последовательности из трёх или четырёх чисел. Если для точки указан только XYZ, её угол берётся из одного чтения в начале маршрута. Четвёртое число задаёт угол этой точки явно. Размеры фигур должны быть положительными. Именованный аргумент <code>plane</code> принимает <code>"xy"</code>, <code>"xz"</code> или <code>"yz"</code>. Порядок букв определяет первую и вторую оси, третья координата сохраняется.</p>
+  <dl>
+    <dt id="draw_line"><code>draw_line(start: Sequence[float], end: Sequence[float]) -&gt; None</code></dt><dd>Переходит к <code>start</code>, затем по прямой к <code>end</code>. Точки могут различаться по всем координатам.</dd>
+    <dt id="draw_rectangle"><code>draw_rectangle(start: Sequence[float], width: float, height: float, *, plane: str = "xy") -&gt; None</code></dt><dd>Из начального угла откладывает ширину по положительной первой оси и высоту по положительной второй, обходит контур и возвращается в <code>start</code>.</dd>
+    <dt id="draw_square"><code>draw_square(start: Sequence[float], side: float, *, plane: str = "xy") -&gt; None</code></dt><dd>Рисует замкнутый квадрат со стороной <code>side</code>. Начальный угол и направление обхода совпадают с прямоугольником.</dd>
+    <dt id="draw_triangle"><code>draw_triangle(start: Sequence[float], side: float, *, plane: str = "xy") -&gt; None</code></dt><dd>Строит равносторонний треугольник. Первая сторона направлена по первой оси, третья вершина смещена к положительной второй оси. Последний отрезок возвращает в <code>start</code>.</dd>
+    <dt id="draw_circle"><code>draw_circle(start: Sequence[float], radius: float, *, segments: int = 72, plane: str = "xy") -&gt; None</code></dt><dd>Начальная точка лежит на окружности. Центр находится на <code>radius</code> позади неё по первой оси. Обход начинается к положительной второй оси и заканчивается в начальной точке. <code>segments</code> задаёт число отрезков, целое от 12 до 720 включительно.</dd>
+  </dl>
+  <p><strong>Подход к началу фигуры также выполняется по прямой.</strong> Высоту пера и состояние инструмента задаёт оператор. Путь проверяется на числовую корректность до подготовки очереди. Достижимость и зазоры зависят от оборудования. Каждый отрезок отдельно дожидается индекса и подтверждения позы. При сбое или <code>stop()</code> оставшиеся отрезки отменяются.</p>
+  <pre data-language="python"><code>start = robot.position()  # Рука уже находится на выбранной высоте
+robot.draw_rectangle(start, width=4, height=2, plane="xy")</code></pre>
 
-  <h2 id="position"><code>position()</code></h2>
-  <pre><code>position() -> tuple[float, float, float, float]</code></pre>
-  <p>Читает одну выборку координат у контроллера. Возвращает кортеж <code>(x, y, z, angle)</code>. Первые три числа задают положение в системе координат робота в миллиметрах. Четвёртое число задаёт угол поворота насадки в градусах.</p>
-  <p>Чтение доступно до первой команды управления и после <code>stop()</code>. Оно не запускает очередь и не блокируется из-за ошибки принятой ранее команды, пока соединение открыто. Во время движения результат описывает текущую выборку и может отличаться от заданной точки. Телеметрия контроллера пригодна для сверки команд с показаниями прошивки. Для физического измерения требуется внешний способ проверки.</p>
-  <p>Библиотека ждёт 32 байта с восемью значениями <code>float32</code>. Все восемь должны быть конечными. Остальные четыре значения, углы сочленений, проверяются при разборе ответа и в кортеж не входят. Ошибка разбора этих данных вызывает <code>ProtocolError</code> без автоматического закрытия открытого сеанса. Отдельные ошибки обмена, например несовпадение ответа с запросом, закрывают соединение. После <code>close()</code> чтение вызывает <code>dobot_usb.errors.ConnectionError</code>.</p>
-
-  <h2 id="move"><code>move(x, y, z, angle=None)</code></h2>
-  <pre><code>move(x: float, y: float, z: float, angle: float | None = None) -> None</code></pre>
-  <p>Выполняет прямолинейное перемещение к абсолютной точке <code>(x, y, z)</code> в миллиметрах. Если <code>angle</code> задан, он задаёт абсолютный угол насадки в градусах. При пропущенном аргументе или явном <code>None</code> библиотека запрашивает текущий угол перед отправкой команды. Для относительного подъёма программа сначала считывает координаты и прибавляет высоту к <code>z</code>.</p>
-  <pre><code>robot.move(x, y, z)                # Сохранить текущий угол
-robot.move(x, y, z, None)          # То же с явным None
-robot.move(x, y, z, 0)             # Задать угол 0°
-robot.move(x=x, y=y, z=z, angle=r) # Задать угол из переменной r
-robot.move(*saved_pose)            # Передать x, y, z и угол из кортежа</code></pre>
-  <p>Координаты и переданный угол принимаются как <code>int</code> или <code>float</code>. Значение должно быть конечным и помещаться в формат <code>float32</code> контроллера. Для <code>bool</code>, строк, бесконечности, <code>NaN</code> и значений вне диапазона возникает <code>ValueError</code> до обмена с роботом. Проверка формата чисел не определяет рабочую зону. Перед запуском проверьте достижимость цели и свободное пространство вдоль всей траектории с установленной насадкой.</p>
-  <ol>
-    <li>Библиотека готовит очередь при необходимости и запрашивает активные ошибки контроллера. При активной ошибке <code>RobotAlarmError</code> с этапом <code>not_sent</code> означает, что запрос перемещения ещё не отправлен. Если текущий угол нужно сохранить, библиотека читает позицию после проверки ошибок.</li>
-    <li>После приёма команды контроллером библиотека ждёт, пока индекс выполнения достигнет её позиции в очереди. Бюджет отправки и ожидания индекса составляет 30 секунд.</li>
-    <li>После выполнения по индексу начинается отдельная сверка координат. В течение 5 секунд библиотека ищет два последовательных показания, близких к цели и друг к другу. Для каждой пары разность по XYZ считается как расстояние в пространстве с допуском 0,3 мм. Проверка угла использует абсолютную разность чисел с допуском 0,65°, без пересчёта по окружности. После каждого чтения позиции снова проверяется состояние ошибок, между итерациями предусмотрена пауза до 40 мс.</li>
-  </ol>
-  <p>Если индекс продвинулся, а показания цели не подтвердились, вызов завершается с <code>ExecutionTimeout</code> и этапом <code>accepted</code>. Ошибки связи, формата ответа или контроллера во время сверки также относятся к этапу <code>accepted</code>. Успех означает совпадение телеметрии по указанным критериям. Паспортная точность, свободная траектория и физическое положение требуют самостоятельной проверки.</p>
-
-  <h2 id="home"><code>home()</code></h2>
-  <pre><code>home() -> None</code></pre>
-  <p>Просит прошивку выполнить её процедуру поиска исходного положения. Рука может двигаться по траектории, заданной контроллером. Перед вызовом освободите пространство, предписанное для этой процедуры вашим устройством. При активной ошибке контроллера <code>RobotAlarmError</code> возникает до отправки запроса <code>home()</code>.</p>
-  <p>На отправку и ожидание по индексу очереди отводится 60 секунд. Метод завершает ожидание по данным очереди и контролирует активные ошибки. После возврата можно отдельно вызвать <code>position()</code> и прочитать сообщаемые координаты. Автоматическая сверка с ожидаемой точкой предусмотрена только у <code>move()</code>. Привязка исходного положения к конкретным XYZ зависит от устройства и его настроек.</p>
-
-  <h2 id="speed"><code>speed(percent)</code></h2>
-  <pre><code>speed(percent: float) -> None</code></pre>
-  <p><code>percent</code> должен быть конечным <code>int</code> или <code>float</code> в диапазоне от 1 до 100 включительно. Например, <code>speed(10)</code> выставляет коэффициенты скорости и ускорения PTP на 10% от базовых параметров контроллера. При расчёте фактических миллиметров в секунду понадобится знать эти параметры и поведение прошивки.</p>
-  <p>Недопустимые значения, включая <code>0</code> и <code>True</code>, приводят к <code>ValueError</code> до обращения к контроллеру. Вызов меняет настройки последующих PTP-перемещений. На отправку и ожидание по индексу отводится 30 секунд. Метод не считывает записанные настройки обратно. Закрытие соединения не отправляет команду сброса коэффициентов. Для остановки движения есть отдельный вызов <a href="#stop"><code>stop()</code></a>.</p>
+  <h2 id="speed">Скорость и поиск исходного положения</h2>
+  <dl><dt><code>speed(percent: float) -&gt; None</code></dt><dd>Задаёт одинаковый процент скорости и ускорения PTP. Диапазон от 1 до 100 включительно, допустима дробная часть. Например, <code>robot.speed(5)</code> задаёт 5% обоих коэффициентов. Метод ожидает индекса и оставляет настройку в контроллере.</dd>
+    <dt id="home"><code>home() -&gt; None</code></dt><dd>Запускает процедуру поиска исходного положения, определённую прошивкой, и ждёт её исполнения в очереди. До отправки проверяет аварийные флаги. Для фактических конечных XYZ и угла считайте <code>position()</code> после возврата. Значение <code>origin</code> сохраняется.</dd></dl>
 
   <h2 id="tools">Присоска и пневматический схват</h2>
-  <p>Используйте методы для физически установленной оснастки. Каждый вызов выделяет 30 секунд на отправку и ожидание по индексу. Контроллер сообщает о прогрессе очереди. Эти методы не читают датчики оснастки и не определяют, что установлено на руке. Состояние предмета, захват и усилие проверяйте отдельно. При остановке очереди и отключении порта отдельные команды оснастке не отправляются.</p>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th scope="col">Метод</th><th scope="col">Флаг разрешения выхода</th><th scope="col">Флаг действия</th></tr></thead>
-      <tbody>
-        <tr><td><code>suck(True)</code> или <code>suction_on()</code></td><td>Да</td><td>Да</td></tr>
-        <tr><td><code>suck(False)</code> или <code>suction_off()</code></td><td>Нет</td><td>Нет</td></tr>
-        <tr><td><code>gripper_open()</code></td><td>Да</td><td>Нет</td></tr>
-        <tr><td><code>gripper_close()</code></td><td>Да</td><td>Да</td></tr>
-        <tr><td><code>gripper_off()</code></td><td>Нет</td><td>Нет</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>Таблица описывает флаги в отправляемом запросе. Подтверждение обработки не сообщает, открылся ли схват или появилось ли разрежение в присоске.</p>
+  <p>Эти команды завершаются, когда индекс контроллера достигает заданного значения. Проверяйте захват и удержание по установленной оснастке. Для отпускания сначала опустите предмет на опору.</p>
+  <dl>
+    <dt id="suck"><code>suck(enabled: bool) -&gt; None</code></dt><dd><code>robot.suck(True)</code> включает выход и присоску, <code>robot.suck(False)</code> отключает оба флага. Принимаются только два значения Python типа <code>bool</code>. Метод доступен с 0.3.0a3.</dd>
+    <dt id="suction_on"><code>suction_on() -&gt; None</code></dt><dd>Совместимый вызов <code>suck(True)</code>.</dd>
+    <dt id="suction_off"><code>suction_off() -&gt; None</code></dt><dd>Совместимый вызов <code>suck(False)</code>.</dd>
+    <dt id="gripper_open"><code>gripper_open() -&gt; None</code></dt><dd>Включает выход схвата и подаёт команду раскрыть губки.</dd>
+    <dt id="gripper_close"><code>gripper_close() -&gt; None</code></dt><dd>Включает выход схвата и подаёт команду сомкнуть губки.</dd>
+    <dt id="gripper_off"><code>gripper_off() -&gt; None</code></dt><dd>Отключает выход схвата. Конечное положение губок зависит от механики.</dd>
+  </dl>
+  <p>Программы для отдельной проверки присоски и схвата приведены в руководстве. <a href="guide.html#tools">Примеры для пневматики</a>.</p>
 
-  <h3 id="suck"><code>suck(enabled)</code></h3>
-  <pre><code>suck(enabled: bool) -> None</code></pre>
-  <p>Вызов <code>robot.suck(True)</code> включает присоску, а <code>robot.suck(False)</code> отключает. Аргумент должен быть значением Python типа <code>bool</code>. Методы <code>suction_on()</code> и <code>suction_off()</code> сохранены для совместимости и вызывают <code>suck(True)</code> и <code>suck(False)</code> соответственно.</p>
+  <h2 id="color">Датчик цвета</h2>
+  <h3 id="color_sensor"><code>color_sensor(enabled: bool = True, *, port: str, version: int) -&gt; None</code></h3>
+  <p>Включает или отключает штатный датчик цвета. Для <code>enabled</code> передайте <code>True</code> или <code>False</code>. Именованные аргументы <code>port</code> и <code>version</code> обязательны. Поддерживаются строки <code>"GP1"</code>, <code>"GP2"</code>, <code>"GP4"</code>, <code>"GP5"</code> и целые поколения датчика 1 или 2. Для датчика V1 на Magician V2 производитель указывает GP2. Выберите разъём и поколение по маркировке оснастки. Метод дожидается подтверждения немедленной записи. Очередь движений при этом сохраняется. <a href="https://github.com/art9762/dobot-kit/blob/v0.3.0a4/docs/color-sensor-research.md">Совместимость и формат обмена</a>.</p>
+  <h3 id="read_color"><code>read_color() -&gt; tuple[int, int, int]</code></h3>
+  <p>Возвращает три целых числа <code>(R, G, B)</code>, каждое от 0 до 255. Для измерения сначала настройте подключённый датчик. Пакет другой длины вызывает <code>ProtocolError</code>. Нулевая выборка допустима. По одному ответу нельзя установить наличие датчика, свежесть измерения или название цвета.</p>
+  <h3 id="watch_color"><code>watch_color()</code></h3>
+  <pre><code>watch_color(
+    handler: Callable[[tuple[int, int, int]], bool | None],
+    *,
+    interval: float = 0.1,
+    stop_event: threading.Event | None = None,
+    changes_only: bool = True,
+) -&gt; None</code></pre>
+  <p><code>handler</code> принимает один кортеж RGB. По умолчанию вызов происходит при первом чтении и каждом точном изменении тройки. Аргумент <code>changes_only</code> принимает только <code>bool</code>. При <code>False</code> обработчик получает каждое чтение. <code>interval</code> задаёт паузу после чтения и обработки от 0,01 до 60 секунд включительно. Укажите <code>stop_event</code> типа <code>threading.Event</code>, чтобы остановить опрос из другого потока. Уже установленное событие завершает метод до первого чтения.</p>
+  <p>Опрос выполняется в вызывающем потоке до установки события или возврата именно <code>False</code> из обработчика. <code>None</code> продолжает цикл. Исключения обработчика, USB и <code>KeyboardInterrupt</code> передаются вызывающему коду. Метод <code>stop()</code> управляет очередью движения. Чтобы отключить датчик, вызовите <code>color_sensor(False, ...)</code> с его разъёмом и поколением.</p>
+  <pre data-language="python"><code># Для датчика V1, установленного на GP2
+samples = []
 
-  <h3 id="suction_on"><code>suction_on()</code></h3>
-  <pre><code>suction_on() -> None</code></pre>
-  <p>Активирует выход управления присоской. После вызова убедитесь, что предмет удерживается, прежде чем поднимать его.</p>
+def collect(rgb):
+    samples.append(rgb)
+    return len(samples) &lt; 3
 
-  <h3 id="suction_off"><code>suction_off()</code></h3>
-  <pre><code>suction_off() -> None</code></pre>
-  <p>Отключает выход управления присоской. Если присоска удерживает предмет, сначала опустите его на подходящую поверхность.</p>
-
-  <h3 id="gripper_open"><code>gripper_open()</code></h3>
-  <pre><code>gripper_open() -> None</code></pre>
-  <p>Оставляет выход управления активным и подаёт команду раскрыть губки. Используйте этот метод для штатного раскрытия схвата.</p>
-
-  <h3 id="gripper_close"><code>gripper_close()</code></h3>
-  <pre><code>gripper_close() -> None</code></pre>
-  <p>Активирует выход управления и подаёт команду закрыть губки. После закрытия убедитесь, что предмет закреплён, прежде чем продолжать движение.</p>
-
-  <h3 id="gripper_off"><code>gripper_off()</code></h3>
-  <pre><code>gripper_off() -> None</code></pre>
-  <p>Отключает выход управления схватом. Физическое положение губок после отключения зависит от оснастки. Для подачи команды открытия используйте <a href="#gripper_open"><code>gripper_open()</code></a>.</p>
-
-  <h2 id="stop"><code>stop()</code></h2>
-  <pre><code>stop() -> None</code></pre>
-  <p>Отправляет контроллеру принудительную остановку очереди и затем команду очистки ожидающих действий. Метод ждёт подтверждения обеих операций, без отдельного чтения позиции. Он может прервать ожидающий вызов в другом потоке и сбрасывает блокировку дальнейших действий после сбоя принятой команды. Следующая команда управления при необходимости снова запустит очередь. Метод не отправляет команд присоске или схвату и не сбрасывает активные ошибки устройства.</p>
-  <p>При ошибке остановки или очистки сеанс закрывается. Одна операция могла пройти, пока вторая завершилась ошибкой. Проверьте фактическое состояние руки перед повторным подключением. У закрытого экземпляра вызов приведёт к <code>dobot_usb.errors.ConnectionError</code>. Программная остановка зависит от живого USB-соединения. При непосредственной опасности используйте штатную физическую остановку согласно инструкции к устройству.</p>
-
-  <h2 id="clear"><code>clear()</code></h2>
-  <pre><code>clear() -> None</code></pre>
-  <p>Если авария прервала движение, вызовите <a href="#stop"><code>stop()</code></a>. Устраните причину аварии и вызовите <code>clear()</code>. Если это первое управляющее действие в сеансе, библиотека сначала остановит и очистит прежнюю очередь.</p>
-  <p>Метод отправляет немедленную команду сброса и считывает аварийные флаги. Пустой набор флагов даёт <code>None</code>. При сохранившихся флагах метод выбрасывает <code>RobotAlarmError</code> с их номерами в поле <code>alarms</code>. Для движения требуется новая команда оператора.</p>
-
-  <h2 id="close"><code>close()</code></h2>
-  <pre><code>close() -> None</code></pre>
-  <p>Закрывает локальное соединение и освобождает порт. Повторный вызов возвращает <code>None</code> без дополнительных действий. Контроллер не получает команду движения, остановки, очистки очереди или управления оснасткой. Уже принятая команда может продолжить выполняться на контроллере. Для нового подключения создайте новый экземпляр.</p>
-
-  <h2 id="queue">Очередь и время выполнения</h2>
-  <p>При первой команде с очередью в каждом соединении библиотека останавливает и очищает очередь, где могли сохраниться действия предыдущего приложения. Это происходит и перед <code>speed()</code>, и перед командой присоски или схвата. Калибровка, чтение и немедленная настройка датчика цвета очередь не трогают. После успешного <code>stop()</code> очередь уже очищена. Откройте порт только в одном приложении, чтобы старая очередь и чужие команды не смешивались с вашими.</p>
-  <p>При постановке в очередь контроллер возвращает индекс команды. Если очередь ещё не запущена, библиотека запускает её. Затем она читает активные ошибки перед каждой проверкой индекса выполнения. Для <code>move()</code> и <code>home()</code> есть дополнительная проверка ошибок до отправки самой команды. Для настроек скорости и оснастки такая предварительная проверка отсутствует.</p>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th scope="col">Этап</th><th scope="col">Бюджет времени в 0.3.0a3</th></tr></thead>
-      <tbody>
-        <tr><td>Обмен отдельным запросом и ответом, в том числе подтверждение записи</td><td>1 секунда на уровне последовательного транспорта</td></tr>
-        <tr><td>Доступ к каналу для <code>position()</code>, подготовки очереди и <code>stop()</code></td><td>30 секунд на этап, затем один или несколько обменов</td></tr>
-        <tr><td>Отправка и ожидание очередного действия <code>move()</code>, <code>speed()</code> или оснастки</td><td>30 секунд</td></tr>
-        <tr><td>Отправка и ожидание <code>home()</code></td><td>60 секунд</td></tr>
-        <tr><td>Сверка позиции после выполнения <code>move()</code> по индексу</td><td>Отдельные 5 секунд</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>Бюджеты относятся к отдельным этапам. Например, подготовка и чтение текущего угла предшествуют 30-секундному бюджету отправки <code>move()</code>. Обмен, начатый до дедлайна, может завершиться чуть позже. Одновременные команды управления в одном экземпляре выполняются последовательно и могут дополнительно ждать друг друга. Параметры тайм-аутов в публичных вызовах отсутствуют.</p>
-
-  <h2 id="errors">Ошибки и диагностика</h2>
-  <p>Неверные значения поддерживаемых аргументов приводят к <code>ValueError</code>. Неполный вызов, лишний аргумент или неизвестное имя аргумента дают обычный <code>TypeError</code> Python. Исключения библиотеки находятся в <code>dobot_usb.errors</code>, их общий базовый класс — <code>DobotError</code>. Исключение <code>dobot_usb.errors.ConnectionError</code> определено отдельным классом библиотеки.</p>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th scope="col">Исключение</th><th scope="col">Когда возникает</th></tr></thead>
-      <tbody>
-        <tr><td><code>ConnectionError</code></td><td>Порт не открылся, связь прервалась или был использован закрытый сеанс.</td></tr>
-        <tr><td><code>RequestTimeout</code></td><td>Один обмен с контроллером не завершился вовремя. Транспорт закрывает соединение.</td></tr>
-        <tr><td><code>ProtocolError</code></td><td>Ответ не соответствует запросу, формат данных нарушен или индекс очереди не согласуется с предыдущими показаниями. Ошибка на уровне обмена закрывает соединение.</td></tr>
-        <tr><td><code>RobotAlarmError</code></td><td>До <code>move()</code> или <code>home()</code>, во время ожидания команды, при сверке позиции или после <code>clear()</code> обнаружены активные ошибки контроллера. Поле <code>alarms</code> содержит номера активных битов.</td></tr>
-        <tr><td><code>ExecutionTimeout</code></td><td>Истёк срок ожидания операции, выполнения в очереди или подтверждения позиции.</td></tr>
-        <tr><td><code>CommandInvalidated</code></td><td>Сеанс или очередь изменились, пока вызов ожидал результата. Такое возможно, если другой поток вызвал <code>stop()</code> или <code>close()</code>.</td></tr>
-        <tr><td><code>DobotError</code></td><td>Предыдущее принятое действие завершилось ошибкой. Новая команда управления отклонена в текущем сеансе до явной остановки.</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>Для журнала доступны <code>stage</code> и его псевдоним <code>outcome</code>. Поля <code>command</code>, <code>queue_index</code> и <code>session_id</code> могут содержать номер команды протокола, индекс назначения и идентификатор сеанса соответственно. Каждое из этих полей равно <code>None</code>, если соответствующие сведения недоступны.</p>
-  <ul>
-    <li><code>not_sent</code> — команда, к которой относится ошибка, не отправлена. До ошибки могли пройти подготовительные запросы, включая остановку и очистку старой очереди.</li>
-    <li><code>sent_unconfirmed</code> — запрос записан в порт, действительного подтверждения нет. При сбое предварительного чтения ошибка может относиться к запросу телеметрии. Смотрите поле <code>command</code>, если оно заполнено.</li>
-    <li><code>accepted</code> — контроллер подтвердил приём команды. Физический результат ещё нужно установить.</li>
-    <li><code>unknown</code> — доступных данных недостаточно, чтобы определить этап.</li>
-  </ul>
-  <p>Этот пример выводит тип ошибки, сообщение и диагностические поля. Вызовы внутри <code>with</code> ограничены чтением позиции.</p>
-  <pre data-language="python"><code>from dobot_usb import Dobot
-from dobot_usb.errors import DobotError
-
+robot.color_sensor(port="GP2", version=1)
 try:
-    with Dobot("COM3") as robot:
-        print(robot.position())
-except DobotError as error:
-    print(type(error).__name__, error, error.stage, error.command)</code></pre>
-  <p>Если робот мог принять действие, сначала проверьте положение руки и оснастку. При действующем соединении используйте <code>stop()</code> перед продолжением. Если соединение закрылось, создайте новый экземпляр после проверки робота. Библиотека не повторяет команду записи автоматически. <a href="behavior.html">Подробнее о поведении и восстановлении</a>.</p>
-  <p>Пошаговые примеры собраны в <a href="guide.html">руководстве</a>. Форматы ответов и внутренний порядок исполнения описаны в <a href="protocol.html">справочнике протокола</a>, запуск тестов и совместимость в <a href="development.html">документации для разработчиков</a>.</p>
+    robot.watch_color(collect, interval=0.1, changes_only=False)
+    print(samples)
+finally:
+    robot.color_sensor(False, port="GP2", version=1)</code></pre>
+
+  <h2 id="stop">Остановка и сброс аварий</h2>
+  <h3><code>stop() -&gt; None</code></h3>
+  <p>Принудительно останавливает очередь и удаляет ожидающие команды. Метод ждёт подтверждений обеих операций. Он может прервать команду из другого потока и разрешает дальнейшие управляющие вызовы после ошибки принятой команды. Выходы пневматики сохраняют своё состояние. При сбое остановки или очистки соединение закрывается. Состояние руки и оснастки после такого сбоя проверьте на месте.</p>
+  <h3 id="clear"><code>clear() -&gt; None</code></h3>
+  <p>Доступен с 0.3.0a3. Если авария прервала движение, вызовите <code>robot.stop()</code>. Устраните причину и вызовите <code>robot.clear()</code>. Метод отправляет немедленный сброс и проверяет флаги обратным чтением. Он возвращает <code>None</code>, когда набор флагов пуст. При сохранении флагов возникает <code>RobotAlarmError</code>. Поле <code>alarms</code> содержит их номера, <code>stage</code> равно <code>"accepted"</code>, так как контроллер уже подтвердил запись сброса. Для движения требуется новая команда оператора.</p>
+
+  <h2 id="queue">Очередь и подтверждение результата</h2>
+  <p>Перед первым движением, <code>home()</code>, <code>speed()</code>, командой пневматики или <code>clear()</code> экземпляр сначала останавливает и очищает прежнюю очередь контроллера. Успешный явный <code>stop()</code> также выполняет подготовку. Калибровка, чтение телеметрии и настройка датчика цвета обходятся без такой подготовки. Один порт и его очередь должны принадлежать одной программе.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th scope="col">Операция</th><th scope="col">Как проверяется выполнение</th></tr></thead>
+    <tbody>
+      <tr><td>Движение к одной точке, включая подход к фигуре</td><td>Аварийные флаги проверяются до отправки. После принятия команды библиотека запускает очередь при необходимости. До 30 с отводится на отправку и достижение индекса. Затем за отдельные 5 с нужны два последовательных показания, близких к цели и друг к другу. Допуск по XYZ — 0,3 мм по расстоянию, по углу — 0,65° по абсолютной разности.</td></tr>
+      <tr><td>Homing, скорость и пневматика</td><td>Аварийные флаги проверяются при ожидании индекса. Для homing есть также проверка перед отправкой. Время на отправку и достижение индекса — до 60 с для homing и 30 с для остальных. Дополнительного чтения конечной позы или состояния оснастки эти методы не выполняют.</td></tr>
+      <tr><td>Немедленные записи</td><td>Настройка датчика возвращается после подтверждения. Сброс аварий дополнительно читает флаги. Сами записи выполняются вне очереди.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Один обмен по USB ограничен одной секундой. Подготовка очереди, ожидание доступа и отдельные чтения занимают дополнительное время. Сроки для движений относятся к каждому отрезку. По одной квитанции о приёме команды нельзя определить фактическую точность движения или удержание детали. <a href="protocol.html">Порядок обмена и форматы пакетов</a>.</p>
+
+  <h2 id="errors">Ошибки и восстановление</h2>
+  <p>Неверное значение аргумента даёт <code>ValueError</code>. Пропущенный обязательный или неизвестный аргумент вызывает <code>TypeError</code>. Ошибки связи и исполнения наследуются от <code>dobot_usb.errors.DobotError</code>.</p>
+  <dl>
+    <dt><code>ConnectionError</code>, <code>RequestTimeout</code></dt><dd>Порт недоступен, связь потеряна или истёк срок обмена. При потере ответа запись могла дойти до контроллера. Библиотека не повторяет её автоматически.</dd>
+    <dt><code>ProtocolError</code></dt><dd>Неожиданный кадр, формат данных или индекс очереди. Ошибки транспортного обмена закрывают соединение.</dd>
+    <dt><code>RobotAlarmError</code></dt><dd>Маска контроллера содержит активные флаги. Поле <code>alarms</code> — кортеж номеров. Сверьте их с документацией прошивки.</dd>
+    <dt><code>ExecutionTimeout</code>, <code>CommandInvalidated</code></dt><dd>Истёк срок операции либо ожидание потеряло связь со своей очередью вследствие остановки или закрытия.</dd>
+  </dl>
+  <p><code>stage</code> и его псевдоним <code>outcome</code> указывают этап затронутой операции. <code>not_sent</code> означает, что запрос ещё не отправлен, хотя подготовка уже могла пройти. <code>sent_unconfirmed</code> означает отправку без подтверждения, <code>accepted</code> — получение подтверждения контроллера, <code>unknown</code> — недостаток сведений. <code>command</code>, <code>queue_index</code> и <code>session_id</code> заполняются по доступным данным.</p>
+  <pre data-language="python"><code>from dobot_usb.errors import RobotAlarmError
+
+# После устранения причины аварии и остановки прерванного движения
+try:
+    robot.clear()
+except RobotAlarmError as error:
+    print("Активные аварии:", error.alarms)
+    raise</code></pre>
+  <p>После сбоя уже принятой команды дальнейшее движение в этом сеансе требует явного <code>stop()</code>. После потери связи сначала проверьте фактическую позу и оснастку, затем откройте новое соединение. <a href="behavior.html#recovery">Восстановление после сбоя</a>.</p>
+  <p>Сигнатуры и поведение приведены по коду выпуска. <a href="https://github.com/art9762/dobot-kit/blob/v0.3.0a4/src/dobot_usb/_robot.py">Класс Dobot</a> · <a href="https://github.com/art9762/dobot-kit/blob/v0.3.0a4/src/dobot_usb/geometry.py">Построение траекторий</a> · <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a4/tests">Тесты с имитацией USB</a>.</p>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a3/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a4/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a3">Выпуск 0.3.0a3</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a4">Выпуск 0.3.0a4</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">
     <p class="nav-name">На этой странице</p>
     <ul>
-      <li class="h2"><a href="#dobot">Dobot(port)</a></li>
-      <li class="h3"><a href="#with">Контекстный менеджер with</a></li>
-      <li class="h2"><a href="#position">position()</a></li>
-      <li class="h2"><a href="#move">move(x, y, z, angle=None)</a></li>
-      <li class="h2"><a href="#home">home()</a></li>
-      <li class="h2"><a href="#speed">speed(percent)</a></li>
-      <li class="h2"><a href="#tools">Присоска и пневматический схват</a></li>
-      <li class="h3"><a href="#suck">suck(enabled)</a></li>
-      <li class="h3"><a href="#suction_on">suction_on()</a></li>
-      <li class="h3"><a href="#suction_off">suction_off()</a></li>
-      <li class="h3"><a href="#gripper_open">gripper_open()</a></li>
-      <li class="h3"><a href="#gripper_close">gripper_close()</a></li>
-      <li class="h3"><a href="#gripper_off">gripper_off()</a></li>
-      <li class="h2"><a href="#stop">stop()</a></li>
-      <li class="h2"><a href="#clear">clear()</a></li>
-      <li class="h2"><a href="#close">close()</a></li>
-      <li class="h2"><a href="#queue">Очередь и время выполнения</a></li>
-      <li class="h2"><a href="#errors">Ошибки и диагностика</a></li>
+      <li class="h2"><a href="#index">Указатель вызовов</a></li>
+      <li class="h2"><a href="#dobot">Подключение и позиция</a></li>
+      <li class="h2"><a href="#helpers">Калибровка и origin</a></li>
+      <li class="h2"><a href="#move">Абсолютное перемещение</a></li>
+      <li class="h2"><a href="#set-axis">Одна координата</a></li>
+      <li class="h2"><a href="#relative">Смещения от начала</a></li>
+      <li class="h2"><a href="#drawing">Отрезок и фигуры</a></li>
+      <li class="h2"><a href="#speed">Скорость и homing</a></li>
+      <li class="h2"><a href="#tools">Присоска и схват</a></li>
+      <li class="h2"><a href="#color">Датчик цвета</a></li>
+      <li class="h2"><a href="#stop">Остановка и сброс</a></li>
+      <li class="h2"><a href="#queue">Очередь и подтверждение</a></li>
+      <li class="h2"><a href="#errors">Ошибки и восстановление</a></li>
     </ul>
   </nav>
 </div>

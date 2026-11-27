@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Совместимость и разработка Dobot Kit 0.3.0a3 для классического DOBOT Magician">
+  <meta name="description" content="Совместимость и разработка Dobot Kit 0.3.0a4 для классического DOBOT Magician">
   <title>Совместимость и разработка | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a3</a>
+      <a class="version" href="development.html#releases">0.3.0a4</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a3/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a4/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -50,23 +50,23 @@
       <nav aria-label="Содержание страницы"><ul>
       <li class="h2"><a href="#compatibility">Устройства и окружение</a></li>
       <li class="h2"><a href="#verification">Статус проверки оборудования</a></li>
-      <li class="h2"><a href="#migration">Переход с 0.2.0a4</a></li>
+      <li class="h2"><a href="#migration">Переход с предыдущих версий</a></li>
       <li class="h2"><a href="#layout">Устройство исходников</a></li>
-      <li class="h2"><a href="#tests">Проверки перед изменением</a></li>
+      <li class="h2"><a href="#tests">Локальная проверка и сборка</a></li>
       <li class="h2"><a href="#releases">Выпуски и изменения</a></li>
       </ul></nav>
     </details>
 <article class="doc-content">
   <h1>Совместимость и разработка</h1>
-  <p class="lead">Какие устройства и окружения охватывает библиотека, как перенести старый код, где находятся тесты и как собирается выпуск.</p>
+  <p class="lead">В 0.3.0a4 обновлена документация. Публичный API совпадает с 0.3.0a3. Ниже приведены версии Python для CI, результаты проверок с контроллером и порядок сборки пакета.</p>
 
   <h2 id="compatibility">Устройства и окружение</h2>
   <div class="table-wrap"><table>
-    <thead><tr><th scope="col">Компонент</th><th scope="col">Контракт 0.3.0a3</th></tr></thead>
+    <thead><tr><th scope="col">Компонент</th><th scope="col">Контракт 0.3.0a4</th></tr></thead>
     <tbody>
       <tr><td>Модель</td><td>Классический четырёхосевой DOBOT Magician со стандартным последовательным протоколом. Для Magician Lite, E6 и других семейств нужен их собственный интерфейс.</td></tr>
       <tr><td>Подключение</td><td>Последовательный порт по USB, указанный оператором. Один владелец порта и очереди контроллера.</td></tr>
-      <tr><td>Оснастка</td><td>Команды для штатной присоски и пневматического схвата. Инструмент устанавливает и проверяет оператор. Библиотека отправляет выходные команды по выбранному методу.</td></tr>
+      <tr><td>Оснастка</td><td>Штатные присоска и пневматический схват, датчик цвета с выбранными разъёмом и поколением. Для пассивного пера библиотека строит пути перемещения. Высоту над поверхностью задаёт оператор.</td></tr>
       <tr><td>Python</td><td>Пакет устанавливается с Python 3.11 и новее. Матрица CI проверяет 3.11–3.14 на Ubuntu и 3.12 на Windows и Intel macOS.</td></tr>
       <tr><td>Зависимость во время работы</td><td><code>pyserial==3.5</code>. Пакет Python и модуль импорта называются соответственно <code>dobot-usb</code> и <code>dobot_usb</code>.</td></tr>
       <tr><td>Форматы дистрибутива</td><td>Универсальный wheel <code>py3-none-any</code> и архив исходников <code>.tar.gz</code>. Для доступа к порту используются драйверы операционной системы.</td></tr>
@@ -74,23 +74,31 @@
   </table></div>
 
   <h2 id="verification">Статус проверки оборудования</h2>
-  <p>В версии 0.3.0a3 проверки выполняются на подменённом последовательном порту. Тесты проверяют байты команд, ответы на <code>clear()</code> и <code>suck()</code>, остановку, таймауты и обработку противоречивой телеметрии. Аппаратный сброс аварийных флагов этой версией пока не проверен.</p>
-  <p>В версии 0.3.0a2 на Magician с прошивкой 4.0.3 проверили 29 публичных методов по USB. Контроллер подтвердил команды движения, homing и изменения флагов выхода присоски. Фигуры выполнялись в воздухе, разъёмы оснастки были свободны. Для оценки удержания предмета и точности рисунка нужны отдельные измерения.</p>
-  <p>В предыдущей серии на контроллере 3.7.0 наблюдали отчёт о достижении восьми целей в воздухе. На 4.0.3 оператор дополнительно видел штрихи на бумаге. Это результаты прежней реализации и конкретной оснастки. Точность нового кода, фактическое время движения, homing и работа захватов требуют проверки на оборудовании.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th scope="col">Версия и условия</th><th scope="col">Что проверили</th></tr></thead>
+    <tbody>
+      <tr><td>0.3.0a3, имитация USB</td><td>Для wheel и исходного архива с PyPI отдельно прошли 283 теста. Среди них проверка байтов включения и отключения присоски, оставшихся аварийных флагов после сброса и потери подтверждения. Новые методы <code>clear()</code> и <code>suck()</code> на реальном роботе в этом выпуске не испытывались. <a href="https://github.com/art9762/dobot-kit/actions/runs/45989103442">CI для тега 0.3.0a3</a>.</td></tr>
+      <tr><td>0.3.0a2, Magician 4.0.3 с ручкой</td><td>27 ноября 2026 г. по USB вызвали все 29 публичных методов. Контроллер сообщил координаты для движения по осям, фигур в воздухе, остановки и homing. Для прежних вызовов присоски и схвата прочитали флаги выходов. На пустом GP2 получили трёхбайтовые отчёты RGB. Удержание предмета, распознавание цвета и точность рисунка физически не измеряли.</td></tr>
+      <tr><td>Более ранняя реализация</td><td>На прошивке 3.7.0 контроллер сообщил о достижении восьми целей в воздухе. На 4.0.3 оператор видел штрихи на бумаге. Архивный отчёт относится к указанным в нём реализации и оснастке.</td></tr>
+    </tbody>
+  </table></div>
   <p><a href="https://github.com/art9762/dobot-kit/blob/f3d961430d3d903a1c9fb14df128770185968ace/docs/HARDWARE.md">Архивный отчёт с конфигурациями и наблюдениями</a></p>
 
-  <h2 id="migration">Переход с 0.2.0a4</h2>
+  <h2 id="migration">Переход с предыдущих версий</h2>
+  <p><strong>С 0.3.0a3.</strong> Обнови пакет обычной командой <code>python -m pip install --upgrade dobot-usb==0.3.0a4</code>. Сигнатуры и поведение методов сохранены.</p>
+  <p><strong>С 0.3.0a2.</strong> Вызовы <code>suction_on()</code> и <code>suction_off()</code> продолжают работать. В новых сценариях можно использовать <code>suck(True)</code> и <code>suck(False)</code>. Для сброса аварийных флагов после устранения причины доступен <a href="guide.html#recovery"><code>clear()</code></a>.</p>
+  <h3>С 0.2.0a4</h3>
   <div class="table-wrap"><table>
-    <thead><tr><th scope="col">Прежний вызов</th><th scope="col">В 0.3.0a3</th><th scope="col">Что проверить при переносе</th></tr></thead>
+    <thead><tr><th scope="col">Прежний вызов</th><th scope="col">В 0.3.0a4</th><th scope="col">Что проверить при переносе</th></tr></thead>
     <tbody>
-      <tr><td><code>connect(port)</code></td><td><code>Dobot(port)</code></td><td>Подключение читает позицию. В новом сеансе первый управляющий вызов останавливает и очищает прежнюю очередь.</td></tr>
+      <tr><td><code>connect(port)</code></td><td><code>Dobot(port)</code></td><td>Подключение читает позицию. Подготовка перед первым действием с очередью либо сбросом аварий останавливает очередь и удаляет старые команды.</td></tr>
       <tr><td><code>bot.pose()</code></td><td><code>x, y, z, angle = bot.position()</code></td><td>Результат содержит четыре числа. Суставные углы через публичный интерфейс больше не выдаются.</td></tr>
       <tr><td><code>bot.move(x, y, z, r)</code></td><td><code>bot.move(x, y, z, angle)</code></td><td>Четвёртая координата задаёт поворот. Передавай четыре числа, если нужно повторить сохранённое положение.</td></tr>
       <tr><td><code>bot.shift(z=5)</code></td><td><code>bot.move(x, y, z + 5)</code></td><td>Сначала получи актуальный <code>x, y, z, angle</code> через <code>position()</code>. Вызов <code>move</code> принимает абсолютную цель.</td></tr>
       <tr><td><code>bot.speed(mm_s, mm_s2)</code></td><td><code>bot.speed(percent)</code></td><td>Единица изменилась. Новое значение задаёт процент от настроенных в контроллере скорости и ускорения.</td></tr>
       <tr><td><code>bot.suction.on()</code> и <code>.off()</code></td><td><code>bot.suck(True)</code> и <code>bot.suck(False)</code></td><td>Проверь установку присоски и удержание предмета.</td></tr>
       <tr><td><code>bot.gripper.open()</code>, <code>.close()</code> и <code>.release()</code></td><td><code>bot.gripper_open()</code>, <code>bot.gripper_close()</code> и <code>bot.gripper_off()</code></td><td>Отключение управления и открытие схвата отправляют разные команды.</td></tr>
-      <tr><td><code>bot.settings.clear_alarms()</code></td><td><code>bot.clear()</code></td><td>Устрани причину аварии перед сбросом. Метод проверит оставшиеся флаги.</td></tr>
+      <tr><td><code>bot.settings.clear_alarms()</code></td><td><code>bot.clear()</code></td><td>При прерванном движении сначала вызови <code>stop()</code>. Устрани причину аварии перед сбросом. Метод проверит оставшиеся флаги.</td></tr>
       <tr><td><code>bot.stop(clear=True)</code></td><td><code>bot.stop()</code></td><td>Остановка всегда сопровождается очисткой ожидающих команд.</td></tr>
       <tr><td><code>dobot ports</code></td><td><code>python -m serial.tools.list_ports</code></td><td>Копируй точное имя нужного порта из списка.</td></tr>
     </tbody>
@@ -101,32 +109,39 @@
   <h2 id="layout">Устройство исходников</h2>
   <dl>
     <dt><code>src/dobot_usb/__init__.py</code> и <code>_robot.py</code></dt><dd>Публичный класс, проверки параметров, синхронные операции и сверка координат после перемещения.</dd>
+    <dt><code>geometry.py</code></dt><dd>Проверка координат, выбор плоскости и расчёт точек фигур.</dd>
     <dt><code>execution.py</code></dt><dd>Экземпляр очереди на одно соединение, подтверждения и индексы, ожидание, смена поколения при остановке.</dd>
     <dt><code>transport.py</code> и <code>protocol.py</code></dt><dd>Настройка последовательного порта, отправка, проверка байтов и разбор ответа.</dd>
     <dt><code>validation.py</code> и <code>errors.py</code></dt><dd>Проверка чисел перед обменом и ошибки со сведениями о том, дошла ли команда до контроллера.</dd>
     <dt><code>tests/</code></dt><dd>Офлайн-проверки открытого API, исполнения, транспорта и формата кадров. Подмена <code>serial.Serial</code> обязательна для тестов.</dd>
+    <dt><code>examples/check_robot.py</code></dt><dd>Проверки с оператором в режимах <code>position</code>, <code>color</code> и <code>motion</code>. Пример входит в архив исходников. Режим <code>position</code> только считывает позу. Параметры всех режимов доступны через <code>--help</code>.</dd>
     <dt><code>docs/</code></dt><dd>Редактируемые HTML-страницы и общий CSS. GitHub Pages публикует эту папку из <code>main</code>. Сохраняй ссылки на разделы, если меняешь заголовки.</dd>
   </dl>
-  <p><a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a3/src/dobot_usb">Исходники пакета для 0.3.0a3</a></p>
+  <p><a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a4/src/dobot_usb">Исходники пакета для 0.3.0a4</a></p>
 
-  <h2 id="tests">Проверки перед изменением</h2>
-  <pre><code>uv sync --locked
+  <h2 id="tests">Локальная проверка и сборка</h2>
+  <p>Клонируй репозиторий, перейди в его папку и выбери тег нужного выпуска. Для тестов нужен checkout Git с каталогом <code>tests/</code>. Зависимости инструментов разработки зафиксированы в <code>uv.lock</code>.</p>
+  <pre><code>git clone https://github.com/art9762/dobot-kit.git
+cd dobot-kit
+git switch --detach v0.3.0a4
+uv sync --locked
 uv run pytest
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy
 uv build</code></pre>
+  <p><code>uv build</code> создаёт wheel и архив исходников в <code>dist/</code>. Для запуска примера из checkout используй <code>uv run python examples/check_robot.py --help</code>. Этот вызов выводит справку без обращения к USB.</p>
   <p>При изменении публичного метода проверь вызов через <code>from dobot_usb import Dobot</code> и повтори его в тесте с подменой транспорта. Для записи проверь байты, обычное подтверждение и потерю подтверждения. Для движения отдельно проверяй реакцию на активную сигнализацию, продвижение индекса и совпадение координат.</p>
   <p>Для аппаратного отчёта зафиксируй модель и прошивку, оснастку, сделанные вызовы, значения индексов и координат, наблюдение оператора и способ измерения. Удали серийные номера из публичного отчёта.</p>
 
   <h2 id="releases">Выпуски и изменения</h2>
   <p>Версия в <code>pyproject.toml</code> и <code>uv.lock</code> совпадает с тегом без ведущей <code>v</code>. Wheel и архив исходников собираются из того же коммита, который указывает тег. Workflow <code>publish.yml</code> сверяет SHA-256 файлов GitHub Release и публикует их на PyPI через Trusted Publishing. Статус пакета, сайта и матрицы CI проверяется отдельно.</p>
-  <p><a href="https://github.com/art9762/dobot-kit/blob/v0.3.0a3/CHANGELOG.md">История изменений</a> · <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a3">Файлы выпуска на GitHub</a> · <a href="https://pypi.org/project/dobot-usb/0.3.0a3/">Дистрибутивы на PyPI</a></p>
+  <p><a href="https://github.com/art9762/dobot-kit/blob/v0.3.0a4/CHANGELOG.md">История изменений</a> · <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a4">Файлы выпуска на GitHub</a> · <a href="https://pypi.org/project/dobot-usb/0.3.0a4/">Дистрибутивы на PyPI</a></p>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a3/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a4/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a3">Выпуск 0.3.0a3</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a4">Выпуск 0.3.0a4</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">
@@ -134,9 +149,9 @@ uv build</code></pre>
     <ul>
       <li class="h2"><a href="#compatibility">Устройства и окружение</a></li>
       <li class="h2"><a href="#verification">Статус проверки оборудования</a></li>
-      <li class="h2"><a href="#migration">Переход с 0.2.0a4</a></li>
+      <li class="h2"><a href="#migration">Переход с предыдущих версий</a></li>
       <li class="h2"><a href="#layout">Устройство исходников</a></li>
-      <li class="h2"><a href="#tests">Проверки перед изменением</a></li>
+      <li class="h2"><a href="#tests">Локальная проверка и сборка</a></li>
       <li class="h2"><a href="#releases">Выпуски и изменения</a></li>
     </ul>
   </nav>

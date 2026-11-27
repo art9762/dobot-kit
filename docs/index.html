@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Документация Dobot Kit 0.3.0a3 для классического DOBOT Magician">
+  <meta name="description" content="Документация Dobot Kit 0.3.0a4 для классического DOBOT Magician">
   <title>Документация | Dobot Kit</title>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -13,11 +13,11 @@
   <div class="header-inner">
     <div class="identity">
       <a class="brand" href="index.html">Dobot Kit</a>
-      <a class="version" href="development.html#releases">0.3.0a3</a>
+      <a class="version" href="development.html#releases">0.3.0a4</a>
     </div>
     <nav class="header-links" aria-label="Исходники и пакет">
       <a href="https://github.com/art9762/dobot-kit">GitHub</a>
-      <a href="https://pypi.org/project/dobot-usb/0.3.0a3/">PyPI</a>
+      <a href="https://pypi.org/project/dobot-usb/0.3.0a4/">PyPI</a>
     </nav>
   </div>
 </header>
@@ -50,45 +50,41 @@
       <nav aria-label="Содержание страницы"><ul>
       <li class="h2"><a href="#install">Установка</a></li>
       <li class="h2"><a href="#read-position">Чтение координат</a></li>
-      <li class="h2"><a href="#scope">Что поддерживает эта версия</a></li>
+      <li class="h2"><a href="#scope">Примеры по задачам</a></li>
       </ul></nav>
     </details>
 <article class="doc-content">
   <h1>Документация Dobot Kit</h1>
-  <p class="lead">Python-библиотека для управления классическим DOBOT Magician по USB. Версия 0.3.0a3, Python 3.11 и новее.</p>
-
-  <div class="doc-grid" aria-label="Разделы документации">
-    <a class="doc-card" href="api.html"><strong>Справочник API</strong><span>Все вызовы, аргументы, единицы, результаты и возможные ошибки.</span></a>
-    <a class="doc-card" href="behavior.html"><strong>Поведение и диагностика</strong><span>Очередь, состояние после ошибки, восстановление связи и ограничения проверки.</span></a>
-    <a class="doc-card" href="protocol.html"><strong>USB-протокол</strong><span>Кадры и ответы, коды команд, таймауты, порядок обмена и проверка позиции.</span></a>
-    <a class="doc-card" href="guide.html"><strong>Начало работы</strong><span>Установка, выбор порта, первое чтение, перемещение и оснастка.</span></a>
-    <a class="doc-card" href="development.html"><strong>Совместимость и разработка</strong><span>Версии Python, история оборудования, миграция, тесты и выпуск пакета.</span></a>
-  </div>
+  <p class="lead">Python-библиотека для управления классическим DOBOT Magician по USB. Версия 0.3.0a4, Python 3.11 и новее.</p>
 
   <h2 id="install">Установка</h2>
-  <pre><code>python -m pip install dobot-usb==0.3.0a3
+  <pre><code>python -m pip install --upgrade dobot-usb==0.3.0a4
 python -m serial.tools.list_ports</code></pre>
   <p>Первая команда устанавливает предварительный выпуск, вторая показывает имена портов. Подставь имя порта своего робота. Дополнительные шаги для Windows, macOS и Linux есть в <a href="guide.html">руководстве по подключению</a>.</p>
 
   <h2 id="read-position">Чтение координат</h2>
   <pre data-language="python"><code>from dobot_usb import Dobot
 
-robot = Dobot("COM3")
-print(robot.position())
-robot.close()</code></pre>
+with Dobot("COM3") as robot:
+    x, y, z, angle = robot.position()
+    print(x, y, z, angle)</code></pre>
   <p><code>position()</code> возвращает четыре числа в порядке <code>x, y, z, angle</code>. Первые три выражены в миллиметрах, угол в градусах. Скрипт только читает данные контроллера.</p>
 
-  <h2 id="scope">Что поддерживает эта версия</h2>
-  <p>Библиотека поддерживает линейные перемещения, рисование фигур, homing, настройку скорости, чтение RGB и управление штатной оснасткой.</p>
-  <p>Для включения присоски вызови <code>robot.suck(True)</code>. Чтобы отключить её, вызови <code>robot.suck(False)</code>. <a href="guide.html#tools">Пример с присоской</a>.</p>
-  <p>Если авария прервала движение, вызови <code>robot.stop()</code>. Устрани причину и сбрось аварийные флаги вызовом <code>robot.clear()</code>. Метод проверит, какие флаги остались активны. <a href="api.html#clear">Результат сброса</a>.</p>
-  <p>Перед первой командой движения, оснастки в очереди или сброса ошибок библиотека останавливает и очищает очередь, оставленную предыдущим сеансом. Подробности и последствия для уже принятой команды описаны в <a href="behavior.html#queue">разделе об очереди</a>.</p>
-  <aside class="callout"><p>Для программ на основе 0.2.0a4 смотри <a href="development.html#migration">таблицу перехода</a>. Текущая версия прошла проверку с имитацией USB-обмена. Физическая проверка описана отдельно в <a href="development.html#verification">статусе совместимости</a>.</p></aside>
+  <h2 id="scope">Примеры по задачам</h2>
+  <div class="doc-grid">
+    <a class="doc-card" href="guide.html#lift"><strong>Сделать первое движение</strong><span>Проверить путь и поднять руку от текущей точки.</span></a>
+    <a class="doc-card" href="api.html#calibrate"><strong>Выбрать начало отсчёта</strong><span>Абсолютные координаты, сохранённая точка и смещения от неё.</span></a>
+    <a class="doc-card" href="api.html#drawing"><strong>Нарисовать фигуру</strong><span>Задать начальную точку, размеры и плоскость движения.</span></a>
+    <a class="doc-card" href="guide.html#tools"><strong>Включить присоску или открыть схват</strong><span>Управлять выходами оснастки и проверить удержание детали.</span></a>
+    <a class="doc-card" href="api.html#color"><strong>Прочитать RGB</strong><span>Выбрать порт и поколение датчика, прочитать одно значение или запустить опрос.</span></a>
+    <a class="doc-card" href="behavior.html#recovery"><strong>Разобраться с аварией</strong><span>Когда вызвать stop(), как сбросить флаги через clear() и где найти оставшиеся коды.</span></a>
+  </div>
+  <p>Версия 0.3.0a4 обновляет документацию к API версии 0.3.0a3. Для переноса старых программ и проверки совместимости смотри <a href="development.html#migration">таблицу перехода</a> и <a href="development.html#verification">результаты испытаний</a>.</p>
 </article>
     <footer class="doc-footer">
-      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a3/docs">Исходники документации</a>
+      <a href="https://github.com/art9762/dobot-kit/tree/v0.3.0a4/docs">Исходники документации</a>
       <a href="https://github.com/art9762/dobot-kit/issues">Сообщить об ошибке</a>
-      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a3">Выпуск 0.3.0a3</a>
+      <a href="https://github.com/art9762/dobot-kit/releases/tag/v0.3.0a4">Выпуск 0.3.0a4</a>
     </footer>
   </main>
   <nav class="contents" aria-label="Содержание страницы">
@@ -96,7 +92,7 @@ robot.close()</code></pre>
     <ul>
       <li class="h2"><a href="#install">Установка</a></li>
       <li class="h2"><a href="#read-position">Чтение координат</a></li>
-      <li class="h2"><a href="#scope">Что поддерживает эта версия</a></li>
+      <li class="h2"><a href="#scope">Примеры по задачам</a></li>
     </ul>
   </nav>
 </div>
