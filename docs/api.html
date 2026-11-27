@@ -55,12 +55,14 @@
       <li class="h2"><a href="#home">home()</a></li>
       <li class="h2"><a href="#speed">speed(percent)</a></li>
       <li class="h2"><a href="#tools">Присоска и пневматический схват</a></li>
+      <li class="h3"><a href="#suck">suck(enabled)</a></li>
       <li class="h3"><a href="#suction_on">suction_on()</a></li>
       <li class="h3"><a href="#suction_off">suction_off()</a></li>
       <li class="h3"><a href="#gripper_open">gripper_open()</a></li>
       <li class="h3"><a href="#gripper_close">gripper_close()</a></li>
       <li class="h3"><a href="#gripper_off">gripper_off()</a></li>
       <li class="h2"><a href="#stop">stop()</a></li>
+      <li class="h2"><a href="#clear">clear()</a></li>
       <li class="h2"><a href="#close">close()</a></li>
       <li class="h2"><a href="#queue">Очередь и время выполнения</a></li>
       <li class="h2"><a href="#errors">Ошибки и диагностика</a></li>
@@ -86,10 +88,12 @@ with Dobot("COM3") as robot:
         <tr><td><a href="#move"><code>move(x, y, z, angle=None)</code></a></td><td>Переместить насадку по прямой к абсолютным координатам.</td></tr>
         <tr><td><a href="#home"><code>home()</code></a></td><td>Запустить процедуру поиска исходного положения.</td></tr>
         <tr><td><a href="#speed"><code>speed(percent)</code></a></td><td>Задать общий процент скорости и ускорения для PTP.</td></tr>
+        <tr><td><a href="#suck"><code>suck(enabled)</code></a></td><td>Включить или отключить присоску. Доступно в исходниках после 0.3.0a2.</td></tr>
         <tr><td><a href="#suction_on"><code>suction_on()</code></a> / <a href="#suction_off"><code>suction_off()</code></a></td><td>Включить или выключить присоску.</td></tr>
         <tr><td><a href="#gripper_open"><code>gripper_open()</code></a> / <a href="#gripper_close"><code>gripper_close()</code></a></td><td>Открыть или закрыть пневматический схват.</td></tr>
         <tr><td><a href="#gripper_off"><code>gripper_off()</code></a></td><td>Отключить выход управления схватом.</td></tr>
         <tr><td><a href="#stop"><code>stop()</code></a></td><td>Принудительно остановить очередь и удалить ожидающие команды.</td></tr>
+        <tr><td><a href="#clear"><code>clear()</code></a></td><td>Сбросить аварийные флаги и проверить результат. Доступно в исходниках после 0.3.0a2.</td></tr>
         <tr><td><a href="#close"><code>close()</code></a></td><td>Освободить порт.</td></tr>
       </tbody>
     </table>
@@ -217,6 +221,10 @@ robot.move(*saved_pose)            # Передать x, y, z и угол из �
   </div>
   <p>Таблица описывает флаги в отправляемом запросе. Подтверждение обработки не сообщает, открылся ли схват или появилось ли разрежение в присоске.</p>
 
+  <h3 id="suck"><code>suck(enabled)</code></h3>
+  <pre><code>suck(enabled: bool) -> None</code></pre>
+  <p>В исходниках после выпуска <code>0.3.0a2</code> вызов <code>robot.suck(True)</code> включает присоску, а <code>robot.suck(False)</code> отключает. Аргумент должен быть значением Python типа <code>bool</code>. Методы <code>suction_on()</code> и <code>suction_off()</code> сохранены для совместимости и вызывают <code>suck(True)</code> и <code>suck(False)</code> соответственно.</p>
+
   <h3 id="suction_on"><code>suction_on()</code></h3>
   <pre><code>suction_on() -> None</code></pre>
   <p>Активирует выход управления присоской. После вызова убедитесь, что предмет удерживается, прежде чем поднимать его.</p>
@@ -241,6 +249,11 @@ robot.move(*saved_pose)            # Передать x, y, z и угол из �
   <pre><code>stop() -> None</code></pre>
   <p>Отправляет контроллеру принудительную остановку очереди и затем команду очистки ожидающих действий. Метод ждёт подтверждения обеих операций, без отдельного чтения позиции. Он может прервать ожидающий вызов в другом потоке и сбрасывает блокировку дальнейших действий после сбоя принятой команды. Следующая команда управления при необходимости снова запустит очередь. Метод не отправляет команд присоске или схвату и не сбрасывает активные ошибки устройства.</p>
   <p>При ошибке остановки или очистки сеанс закрывается. Одна операция могла пройти, пока вторая завершилась ошибкой. Проверьте фактическое состояние руки перед повторным подключением. У закрытого экземпляра вызов приведёт к <code>dobot_usb.errors.ConnectionError</code>. Программная остановка зависит от живого USB-соединения. При непосредственной опасности используйте штатную физическую остановку согласно инструкции к устройству.</p>
+
+  <h2 id="clear"><code>clear()</code></h2>
+  <pre><code>clear() -> None</code></pre>
+  <p>Метод доступен в исходниках после выпуска <code>0.3.0a2</code>. Если авария прервала движение, вызовите <a href="#stop"><code>stop()</code></a>. Устраните причину аварии и вызовите <code>clear()</code>. Если это первое управляющее действие в сеансе, библиотека сначала остановит и очистит прежнюю очередь.</p>
+  <p>Метод отправляет немедленную команду сброса и считывает аварийные флаги. Пустой набор флагов даёт <code>None</code>. При сохранившихся флагах метод выбрасывает <code>RobotAlarmError</code> с их номерами в поле <code>alarms</code>. Для движения требуется новая команда оператора.</p>
 
   <h2 id="close"><code>close()</code></h2>
   <pre><code>close() -> None</code></pre>
@@ -314,12 +327,14 @@ except DobotError as error:
       <li class="h2"><a href="#home">home()</a></li>
       <li class="h2"><a href="#speed">speed(percent)</a></li>
       <li class="h2"><a href="#tools">Присоска и пневматический схват</a></li>
+      <li class="h3"><a href="#suck">suck(enabled)</a></li>
       <li class="h3"><a href="#suction_on">suction_on()</a></li>
       <li class="h3"><a href="#suction_off">suction_off()</a></li>
       <li class="h3"><a href="#gripper_open">gripper_open()</a></li>
       <li class="h3"><a href="#gripper_close">gripper_close()</a></li>
       <li class="h3"><a href="#gripper_off">gripper_off()</a></li>
       <li class="h2"><a href="#stop">stop()</a></li>
+      <li class="h2"><a href="#clear">clear()</a></li>
       <li class="h2"><a href="#close">close()</a></li>
       <li class="h2"><a href="#queue">Очередь и время выполнения</a></li>
       <li class="h2"><a href="#errors">Ошибки и диагностика</a></li>

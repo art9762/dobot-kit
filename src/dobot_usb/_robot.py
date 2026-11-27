@@ -338,15 +338,20 @@ class Dobot:
         with self._action():
             self._executor.submit(_SPEED, struct.pack("<2f", percent, percent))
 
+    def suck(self, enabled: bool) -> None:
+        """Turn the suction cup on (True) or off (False)."""
+        if type(enabled) is not bool:
+            raise ValueError("enabled must be bool")
+        with self._action():
+            self._executor.submit(_SUCTION, bytes((enabled, enabled)))
+
     def suction_on(self) -> None:
         """Turn on the suction cup."""
-        with self._action():
-            self._executor.submit(_SUCTION, b"\x01\x01")
+        self.suck(True)
 
     def suction_off(self) -> None:
         """Turn off the suction cup."""
-        with self._action():
-            self._executor.submit(_SUCTION, b"\x00\x00")
+        self.suck(False)
 
     def gripper_open(self) -> None:
         """Open the pneumatic gripper."""
@@ -366,6 +371,23 @@ class Dobot:
     def stop(self) -> None:
         """Force-stop motion and clear pending commands. Tool outputs stay as they are."""
         self._executor.stop()
+
+    def clear(self) -> None:
+        """Reset controller alarm flags after correcting the cause and verify the result.
+
+        Call stop() first if a motion was interrupted. Raises RobotAlarmError
+        with the remaining codes if the controller still reports active flags.
+        """
+        with self._action():
+            receipt = self._executor.submit(_ALARMS, queued=False, wait=False)
+            try:
+                self._check_alarms()
+            except DobotError as exc:
+                # The reset was acknowledged before this verification read failed.
+                exc.stage = "accepted"
+                exc.command = _ALARMS
+                exc.session_id = receipt.session_id
+                raise
 
     def close(self) -> None:
         """Disconnect from the USB port."""

@@ -86,6 +86,7 @@
     <tbody>
       <tr><td>10</td><td>Чтение позиции</td><td>GET, пусто</td><td><code>&lt;8f</code>, XYZ, угол, затем четыре суставных угла.</td></tr>
       <tr><td>20</td><td>Проверка сигнализации</td><td>GET, пусто</td><td>16 байт. Номер активного бита равен <code>8 × индекс_байта + индекс_бита</code>. Счёт с нуля, младший бит первым.</td></tr>
+      <tr><td>20</td><td><a href="api.html#clear"><code>clear()</code></a> (после 0.3.0a2)</td><td>Немедленный SET, пусто.</td><td>Пустое подтверждение. После него библиотека читает флаги через GET 20.</td></tr>
       <tr><td>31</td><td><code>home()</code></td><td>SET в очередь, зарезервированный <code>&lt;I</code> со значением 0.</td><td>Индекс <code>&lt;Q</code>.</td></tr>
       <tr><td>62</td><td>Присоска</td><td>SET в очередь, два байта <code>enabled, active</code>. Включение <code>01 01</code>, выключение <code>00 00</code>.</td><td>Индекс <code>&lt;Q</code>.</td></tr>
       <tr><td>63</td><td>Схват</td><td>SET в очередь, два байта <code>enabled, active</code>. Открыть <code>01 00</code>, закрыть <code>01 01</code>, отключить <code>00 00</code>.</td><td>Индекс <code>&lt;Q</code>.</td></tr>

@@ -187,6 +187,7 @@ with Dobot("COM3") as robot:
     robot.suction_on()
     input("Проверь присоску и нажми Enter для выключения ")
     robot.suction_off()</code></pre>
+  <p>Пример выше работает в 0.3.0a2. В исходниках следующего выпуска те же действия доступны через <a href="api.html#suck"><code>robot.suck(True)</code> и <code>robot.suck(False)</code></a>.</p>
 
   <h3>Проверка схвата</h3>
   <p>Сохрани код в <code>gripper.py</code> и запусти <code>python gripper.py</code>. Проверь движение губок без предмета, держа руки вдали от оснастки. <code>gripper_off()</code> отключает управляющий выход. Чтобы разжать губки, используй <code>gripper_open()</code>.</p>
